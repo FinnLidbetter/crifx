@@ -1,0 +1,96 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crifx"
+version = "0.1.0"
+description = "ICPC Contest Reporting and Insights tool For anyone."
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+readme = "README.md"
+keywords = ["icpc", "contest", "competitive programming", "problemtools"]
+dependencies = [ "pylatex==1.4.2" ]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Tox",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Utilities",
+]
+
+[project.scripts]
+crifx = "crifx.cli:main"
+
+[project.optional-dependencies]
+dev = ["black", "ruff", "tox", "mypy", "pytest"]
+
+[tool.black]
+line_length = 88
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "D"
+]
+ignore = ["D211", "D212", "D213"]
+
+[tool.isort]
+multi_line_output = 3
+line_length = 88
+include_trailing_comma = true
+
+[tool.pytest.ini_options]
+pythonpath = "."
+
+[tool.tox]
+legacy_tox_ini = """
+    [tox]
+    envlist = format-py{312}, lint-py{312}, type-py{312}, py{310,311,312}
+    requires =
+        tox>=4
+    isolated_build = True
+
+    [testenv]
+    description = run unit tests
+    deps =
+        pytest>=8
+    commands =
+        pytest {posargs:tests}
+
+
+    [staticenv:format]
+    description = run black formatting and dependency sorting
+    skip_install = true
+    deps =
+        black>=24
+        isort>=5
+    commands =
+        black . --check
+        isort . --check-only
+
+    [staticenv:lint]
+    description = run ruff linting
+    skip_install = true
+    deps =
+        ruff>=0.4
+    commands = ruff check .
+
+
+    [staticenv:type]
+    description = run type checks
+    deps =
+        pytest>=8
+        mypy>=1.10
+    commands =
+        mypy {posargs:crifx tests}
+"""
