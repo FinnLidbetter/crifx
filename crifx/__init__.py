@@ -2,6 +2,4 @@
 
 from crifx.report_writer import write_report
 
-__all__ = [
-    "write_report"
-]
+__all__ = ["write_report"]

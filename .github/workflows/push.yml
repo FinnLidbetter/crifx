@@ -1,0 +1,32 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    name: lint
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - run: pip install tox
+      - run: tox -m static
+
+  build-unix:
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-22.04"]
+        python: ["3.10", "3.11", "3.12"]
+
+    runs-on: ${{ matrix.os }}
+    name: test on ${{ matrix.python }} (${{ matrix.os }})
+
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e '.[dev]'
+      - run: pytest
