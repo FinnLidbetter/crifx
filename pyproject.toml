@@ -34,6 +34,7 @@ dev = ["black", "ruff", "tox", "mypy", "pytest"]
 line_length = 88
 
 [tool.ruff]
+extend-exclude = ["tests/scenarios/"]
 line-length = 88
 
 [tool.ruff.lint]

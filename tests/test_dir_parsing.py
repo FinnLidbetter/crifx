@@ -1,8 +1,8 @@
 """Tests for file hierarchy parsing."""
 
 import os
-import uuid
 import unittest.mock as mock
+import uuid
 
 from crifx.dir_layout_parsing import (
     find_contest_problems_root,
