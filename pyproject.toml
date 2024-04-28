@@ -10,7 +10,7 @@ requires-python = ">=3.8"
 license = {file = "LICENSE"}
 readme = "README.md"
 keywords = ["icpc", "contest", "competitive programming", "problemtools"]
-dependencies = [ "pylatex==1.4.2" ]
+dependencies = [ "pylatex>=1.4.2", "pygit2>=1.14.1" ]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Framework :: Tox",
@@ -51,10 +51,14 @@ include_trailing_comma = true
 [tool.pytest.ini_options]
 pythonpath = "."
 
+[[tool.mypy.overrides]]
+module = "pylatex.*,pygit2.*"
+ignore_missing_imports = true
+
 [tool.tox]
 legacy_tox_ini = """
     [tox]
-    envlist = format-py{312}, lint-py{312}, type-py{312}, py{310,311,312}
+    envlist = format, lint, type, py{310,311,312}
     requires =
         tox>=4
     isolated_build = True
