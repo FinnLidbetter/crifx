@@ -41,7 +41,7 @@ line-length = 88
 select = [
     "D"
 ]
-ignore = ["D211", "D212", "D213"]
+ignore = ["D107", "D203", "D212", "D213"]
 
 [tool.isort]
 multi_line_output = 3
