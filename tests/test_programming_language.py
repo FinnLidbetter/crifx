@@ -1,7 +1,6 @@
 """Tests for the ProgrammingLanguage enumeration object."""
 
 from crifx.contest_objects import ProgrammingLanguage
-from crifx.contest_objects.programming_language import guess_programming_language
 
 
 def test_guess_language():
@@ -22,7 +21,7 @@ def test_guess_language():
     ]
     # Languages are guessed from filenames as expected.
     for filename, expected in cases:
-        assert guess_programming_language(filename) is expected
+        assert ProgrammingLanguage.from_filename(filename) is expected
     # All languages are tested.
     languages_tested = set(language for _, language in cases if language is not None)
     assert len(languages_tested) == len(ProgrammingLanguage)

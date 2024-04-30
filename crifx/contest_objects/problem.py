@@ -3,7 +3,7 @@
 from collections import defaultdict
 from dataclasses import dataclass
 
-from crifx.contest_objects.author import Author
+from crifx.contest_objects.judge import Judge
 from crifx.contest_objects.judgement import Judgement
 from crifx.contest_objects.problem_test_case import ProblemTestCase
 from crifx.contest_objects.programming_language import ProgrammingLanguage
@@ -14,6 +14,7 @@ from crifx.contest_objects.submission import Submission
 class Problem:
     """Data for a Problem."""
 
+    name: str
     test_data: list[ProblemTestCase]
     submissions: list[Submission]
 
@@ -37,7 +38,7 @@ class Problem:
 
     def independent_ac_count(self) -> int:
         """Get the number of AC submissions by different authors."""
-        accepted_authors: list[Author] = []
+        accepted_authors: list[Judge] = []
         for submission in self.ac_submissions:
             if any(submission.author.is_same(author) for author in accepted_authors):
                 continue

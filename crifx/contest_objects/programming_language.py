@@ -1,6 +1,7 @@
 """Programming language enumeration object."""
 
 from enum import Enum
+from typing import Union
 
 
 class ProgrammingLanguage(Enum):
@@ -35,15 +36,15 @@ class ProgrammingLanguage(Enum):
             case ProgrammingLanguage.VIVA:
                 return ["viva"]
 
-
-def guess_programming_language(filename: str) -> ProgrammingLanguage | None:
-    """Guess the programming language from a file name."""
-    extension = filename[filename.rindex(".") + 1 :]
-    for programming_language_str in ProgrammingLanguage:
-        programming_language = ProgrammingLanguage(programming_language_str)
-        if extension in programming_language.file_extensions():
-            return programming_language
-    return None
+    @staticmethod
+    def from_filename(filename: str) -> Union["ProgrammingLanguage", None]:
+        """Guess the programming language from a file name."""
+        extension = filename[filename.rindex(".") + 1 :]
+        for programming_language_str in ProgrammingLanguage:
+            programming_language = ProgrammingLanguage(programming_language_str)
+            if extension in programming_language.file_extensions():
+                return programming_language
+        return None
 
 
 class LanguageGroup:

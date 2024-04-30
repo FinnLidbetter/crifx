@@ -24,6 +24,10 @@ class GitUser:
             signature.name, signature.email, signature.raw_name, signature.raw_email
         )
 
+    def __str__(self):
+        """Get a string representation of a git user."""
+        return f"{self.name} <{self.email}>"
+
 
 class GitManager:
     """Manager class for interacting with git."""

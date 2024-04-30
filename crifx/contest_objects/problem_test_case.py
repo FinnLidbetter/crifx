@@ -10,10 +10,10 @@ class ProblemTestCase:
 
     name: str
     is_sample: bool
-    image_extension: str | None
     input_lines: list[str]
     answer_lines: list[str]
     description_lines: list[str]
+    image_extension: str | None
 
     @property
     def has_description(self):

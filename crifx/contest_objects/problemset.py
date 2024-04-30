@@ -1,6 +1,6 @@
 """Data structure and manager for a problem set."""
 
-from crifx.contest_objects.author import Author
+from crifx.contest_objects.judge import Judge
 from crifx.contest_objects.problem import Problem
 
 
@@ -10,7 +10,7 @@ class ProblemSet:
     def __init__(self, problems: list[Problem]):
         self.problems = problems
 
-    def submission_authors(self) -> list[Author]:
+    def submission_authors(self) -> list[Judge]:
         """Get the set of authors that have contributed at least one submission."""
         authors = set()
         for problem in self.problems:
