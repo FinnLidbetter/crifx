@@ -70,13 +70,11 @@ class ProblemSetParser:
         """Parse the problem test cases from a problem directory."""
         sample_data_dir = os.path.join(problem_root_dir, "data", "sample")
         secret_data_dir = os.path.join(problem_root_dir, "data", "secret")
-        return self._parse_test_case_dir(
-            sample_data_dir, True, "sample/"
-        ) + self._parse_test_case_dir(secret_data_dir, False, "secret/")
+        return self._parse_test_case_dir(sample_data_dir) + self._parse_test_case_dir(
+            secret_data_dir
+        )
 
-    def _parse_test_case_dir(
-        self, test_case_dir: str, is_sample: bool, prefix: str = ""
-    ):
+    def _parse_test_case_dir(self, test_case_dir: str):
         """Parse the test cases from a test case directory."""
         in_files = set()
         ans_files = set()
@@ -89,11 +87,7 @@ class ProblemSetParser:
                     ans_files.add(filename[:-4])
             elif os.path.isdir(filename):
                 nested_dir = os.path.join(test_case_dir, filename)
-                test_cases.extend(
-                    self._parse_test_case_dir(
-                        nested_dir, is_sample, f"{prefix}{filename}/"
-                    )
-                )
+                test_cases.extend(self._parse_test_case_dir(nested_dir))
         for in_filename in in_files:
             if in_filename not in ans_files:
                 logging.warning(
@@ -107,7 +101,8 @@ class ProblemSetParser:
         for filename in in_files:
             if filename not in ans_files:
                 continue
-            name = f"{prefix}{filename}"
+            name = filename
+            is_sample = test_case_dir.startswith("sample")
             input_lines = []
             ans_lines: list[str] = []
             desc_lines = []
@@ -133,7 +128,13 @@ class ProblemSetParser:
             except (FileExistsError, FileNotFoundError, PermissionError):
                 logging.exception("Test case file could not be read.")
             test_case = ProblemTestCase(
-                name, is_sample, input_lines, ans_lines, desc_lines, image_extension
+                name,
+                is_sample,
+                test_case_dir,
+                input_lines,
+                ans_lines,
+                desc_lines,
+                image_extension,
             )
             test_cases.append(test_case)
         return test_cases

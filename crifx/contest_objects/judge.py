@@ -23,7 +23,7 @@ class Judge:
         """Determine if two Judge objects correspond to the same person."""
         return (
             self.git_name == other_judge.git_name
-            or self.primary_name == other_judge.git_name
+            or self.primary_name == other_judge.primary_name
         )
 
 

@@ -36,6 +36,11 @@ class Problem:
         """Get the TLE submissions."""
         return self._get_submissions_with_judgement(Judgement.TIME_LIMIT_EXCEEDED)
 
+    @property
+    def rte_submissions(self) -> list[Submission]:
+        """Get the RTE submissions."""
+        return self._get_submissions_with_judgement(Judgement.RUN_TIME_ERROR)
+
     def independent_ac_count(self) -> int:
         """Get the number of AC submissions by different authors."""
         accepted_authors: list[Judge] = []

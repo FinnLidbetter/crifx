@@ -1,10 +1,12 @@
 """Pytest fixtures."""
 
 import os
-import shutil
 import uuid
 
 import pytest
+
+from crifx.contest_objects import Judge, Judgement, ProgrammingLanguage, Submission
+from crifx.git_manager import GitUser
 
 
 @pytest.fixture
@@ -30,5 +32,38 @@ def make_problem_skeleton_dir(tmp_path):
         os.mkdir(os.path.join(problem_path, "problem_statement"))
         os.mkdir(os.path.join(problem_path, "input_format_validators"))
         return problem_path
+
+    yield _func
+
+
+@pytest.fixture
+def make_judged_lang_submission():
+    """Make a submission with a given judgement and programming language."""
+
+    def _func(judgement: Judgement, language: ProgrammingLanguage) -> Submission:
+        return Submission(Judge("name", None), "solution", language, judgement, 1, 1)
+
+    yield _func
+
+
+@pytest.fixture
+def make_authored_submission():
+    """Make a submission with a Judge with the given primary name and git name."""
+
+    def _func(
+        primary_name: str,
+        git_name: str | None,
+        judgement: Judgement = Judgement.ACCEPTED,
+        language: ProgrammingLanguage = ProgrammingLanguage.JAVA,
+    ) -> Submission:
+        if git_name is None:
+            judge = Judge(primary_name, None)
+        else:
+            git_email = f"{git_name}@example.com"
+            git_user = GitUser(
+                git_name, git_email, str.encode(git_name), str.encode(git_email)
+            )
+            judge = Judge(primary_name, git_user)
+        return Submission(judge, "solution", language, judgement, 0, 0)
 
     yield _func
