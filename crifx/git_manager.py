@@ -37,6 +37,7 @@ class GitManager:
         if repo_path is None:
             raise ValueError(f"Path '{path_in_repo}' is not in a git repository.")
         self.repo = Repository(repo_path)
+        self.repo_root = os.path.abspath(os.path.join(repo_path, os.pardir))
 
     def get_committers_and_authors(self) -> list[GitUser]:
         """Get a list of every git user that has authored or committed a commit."""
@@ -49,10 +50,11 @@ class GitManager:
             git_users.add(GitUser.from_signature(committer))
         return sorted(git_users, key=lambda x: x.name)
 
-    def guess_file_author(self, path: str) -> GitUser | None:
+    def guess_file_author(self, abs_path: str) -> GitUser | None:
         """Guess the author of a file path."""
-        if not os.path.isfile(path):
-            raise ValueError(f"Path '{path}' is not a file.")
+        if not os.path.isfile(abs_path):
+            raise ValueError(f"Path '{abs_path}' is not a file.")
+        path = os.path.relpath(abs_path, self.repo_root)
         blame = self.repo.blame(
             path, flags=BlameFlag.NORMAL | BlameFlag.IGNORE_WHITESPACE
         )

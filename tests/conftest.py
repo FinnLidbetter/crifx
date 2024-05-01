@@ -19,6 +19,13 @@ def tmp_file_path(tmp_path):
 
 
 @pytest.fixture
+def scenarios_path(request):
+    """Get the path to the scenarios directory."""
+    tests_path = os.path.dirname(request.module.__file__)
+    yield os.path.join(tests_path, "scenarios")
+
+
+@pytest.fixture
 def make_problem_skeleton_dir(tmp_path):
     """Make a problem directory skeleton."""
 
