@@ -80,12 +80,13 @@ class ProblemSetParser:
         ans_files = set()
         test_cases = []
         for filename in os.listdir(test_case_dir):
-            if os.path.isfile(filename):
+            file_path = os.path.join(test_case_dir, filename)
+            if os.path.isfile(file_path):
                 if filename.endswith(".in"):
                     in_files.add(filename[:-3])
                 elif filename.endswith(".ans"):
                     ans_files.add(filename[:-4])
-            elif os.path.isdir(filename):
+            elif os.path.isdir(file_path):
                 nested_dir = os.path.join(test_case_dir, filename)
                 test_cases.extend(self._parse_test_case_dir(nested_dir))
         for in_filename in in_files:

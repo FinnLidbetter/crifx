@@ -15,7 +15,7 @@ class Problem:
     """Data for a Problem."""
 
     name: str
-    test_data: list[ProblemTestCase]
+    test_cases: list[ProblemTestCase]
     submissions: list[Submission]
 
     def _get_submissions_with_judgement(self, judgement):
