@@ -12,7 +12,7 @@ def test_scenario_1(scenarios_path):
     git_manager = GitManager(scenarios_path)
     parser = ProblemSetParser(path, git_manager)
     problemset = parser.parse_problemset()
-    assert len(problemset.problems) == 1
+    assert len(problemset.problems) == 2
     assert len(problemset.problems[0].test_cases) == 5
     assert problemset.problems[0].test_cases
     desc_test_cases = list(

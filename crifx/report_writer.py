@@ -18,6 +18,7 @@ class ReportWriter:
         self.problem_set = problem_set
         self.problem_set.problems.sort(key=lambda x: x.name)
         self.git_manager = git_manager
+        self.doc: Document | None = None
 
     def build_report(self, crifx_dir_path: str) -> Document:
         """Build the report."""
@@ -25,6 +26,7 @@ class ReportWriter:
         doc = Document(report_tex_path)
         self._set_preamble(doc)
         self._write_body(doc)
+        self.doc = doc
         return doc
 
     def _set_preamble(self, doc: Document):
@@ -70,6 +72,26 @@ class ReportWriter:
                 )
                 table.add_hline()
 
+    def write_tex(self, dirpath):
+        """Write the tex output."""
+        if self.doc is None:
+            raise ValueError(
+                "The tex file cannot be written yet. The document has not been built."
+            )
+        filepath = os.path.join(dirpath, REPORT_FILENAME)
+        logging.debug("Writing tex to %s", filepath)
+        self.doc.generate_tex(filepath)
+
+    def write_pdf(self, dirpath):
+        """Write a pdf file from the tex file."""
+        if self.doc is None:
+            raise ValueError(
+                "The pdf file cannot be written yet. The document has not been built."
+            )
+        filepath = os.path.join(dirpath, REPORT_FILENAME)
+        logging.debug("Writing pdf to %s", filepath)
+        self.doc.generate_pdf(filepath, clean=True, clean_tex=False)
+
 
 def make_crifx_dir(containing_dir_path: str) -> str:
     """Create the crifx directory."""
@@ -77,20 +99,3 @@ def make_crifx_dir(containing_dir_path: str) -> str:
     if not os.path.exists(crifx_dir_path):
         os.mkdir(crifx_dir_path)
     return crifx_dir_path
-
-
-def write_report(crifx_dir_path: str) -> Document:
-    """Write the crifx report tex file."""
-    report_tex_path = os.path.join(crifx_dir_path, REPORT_FILENAME)
-    doc = Document(report_tex_path)
-
-    logging.debug("Writing tex file to %s.tex", report_tex_path)
-    doc.generate_tex()
-    return doc
-
-
-def generate_pdf(pdf_dir_path, doc: Document):
-    """Generate the crifx pdf report."""
-    report_pdf_path = os.path.join(pdf_dir_path, REPORT_FILENAME)
-    logging.debug("Generating pdf at %s.pdf", report_pdf_path)
-    doc.generate_pdf(report_pdf_path, clean=True, clean_tex=True)

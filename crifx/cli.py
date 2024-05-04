@@ -8,7 +8,7 @@ import sys
 from crifx.dir_layout_parsing import find_contest_problems_root
 from crifx.git_manager import GitManager
 from crifx.problemset_parser import ProblemSetParser
-from crifx.report_writer import ReportWriter, generate_pdf, make_crifx_dir, write_report
+from crifx.report_writer import ReportWriter, make_crifx_dir
 
 CRIFX_ERROR_EXIT_CODE = 23
 
@@ -56,9 +56,9 @@ def main():
     problemset_parser = ProblemSetParser(problemset_root_path, git_manager)
     problemset = problemset_parser.parse_problemset()
     writer = ReportWriter(problemset, git_manager)
-    doc = writer.build_report(crifx_dir_path)
-    doc.generate_tex()
-    generate_pdf(problemset_root_path, doc)
+    writer.build_report(crifx_dir_path)
+    writer.write_tex(crifx_dir_path)
+    writer.write_pdf(problemset_root_path)
 
 
 if __name__ == "__main__":

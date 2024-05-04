@@ -2,13 +2,19 @@
 
 import os
 
-from crifx import write_report
+from crifx.contest_objects import ProblemSet
+from crifx.git_manager import GitManager
+from crifx.report_writer import ReportWriter
 
 
-def test_write_report(tmp_path):
-    """A report tex file is can be written to the expected path."""
+def test_write_report(tmp_path, scenarios_path):
+    """A report tex file can be written to the expected path."""
     assert not os.listdir(tmp_path)
-    write_report(tmp_path)
+    problemset = ProblemSet([])
+    git_manager = GitManager(scenarios_path)
+    writer = ReportWriter(problemset, git_manager)
+    writer.build_report(tmp_path)
+    writer.write_tex(tmp_path)
     expected_file = "crifx-report.tex"
     assert expected_file in os.listdir(tmp_path)
     report_path = os.path.join(tmp_path, expected_file)
