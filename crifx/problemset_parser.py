@@ -76,6 +76,8 @@ class ProblemSetParser:
 
     def _parse_test_case_dir(self, test_case_dir: str):
         """Parse the test cases from a test case directory."""
+        if not os.path.exists(test_case_dir):
+            return []
         in_files = set()
         ans_files = set()
         test_cases = []

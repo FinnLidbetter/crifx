@@ -69,3 +69,12 @@ class GitManager:
                 lines_max = lines_modified[git_user]
                 user_max = git_user
         return user_max
+
+    def get_commit_id(self):
+        """Get the current commit id."""
+        return self.repo.head.target
+
+    def get_short_commit_id(self):
+        """Get the first 8 characters of the current commit id."""
+        commid_id_str = str(self.get_commit_id())
+        return commid_id_str[:8]

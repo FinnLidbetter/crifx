@@ -6,7 +6,9 @@ import os
 import sys
 
 from crifx.dir_layout_parsing import find_contest_problems_root
-from crifx.report_writing import generate_pdf, make_crifx_dir, write_report
+from crifx.git_manager import GitManager
+from crifx.problemset_parser import ProblemSetParser
+from crifx.report_writer import ReportWriter, generate_pdf, make_crifx_dir, write_report
 
 CRIFX_ERROR_EXIT_CODE = 23
 
@@ -42,16 +44,21 @@ def main():
     )
     logging.basicConfig(level=log_level, format=log_format)
     logging.debug("Running crifx-cli from %s", os.getcwd())
-    crifx_containing_dir = find_contest_problems_root()
-    if crifx_containing_dir is None:
+    problemset_root_path = find_contest_problems_root()
+    if problemset_root_path is None:
         logging.error(
             "Could not find contest problems root from the current directory: %s",
             os.getcwd(),
         )
         sys.exit(CRIFX_ERROR_EXIT_CODE)
-    crifx_dir_path = make_crifx_dir(crifx_containing_dir)
-    doc = write_report(crifx_dir_path)
-    generate_pdf(crifx_containing_dir, doc)
+    crifx_dir_path = make_crifx_dir(problemset_root_path)
+    git_manager = GitManager(problemset_root_path)
+    problemset_parser = ProblemSetParser(problemset_root_path, git_manager)
+    problemset = problemset_parser.parse_problemset()
+    writer = ReportWriter(problemset, git_manager)
+    doc = writer.build_report(crifx_dir_path)
+    doc.generate_tex()
+    generate_pdf(problemset_root_path, doc)
 
 
 if __name__ == "__main__":
