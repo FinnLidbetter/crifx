@@ -12,14 +12,14 @@ def test_scenario_1(scenarios_path):
     git_manager = GitManager(scenarios_path)
     parser = ProblemSetParser(path, git_manager)
     problemset = parser.parse_problemset()
-    assert len(problemset.problems) == 2
-    assert len(problemset.problems[0].test_cases) == 5
-    assert problemset.problems[0].test_cases
-    desc_test_cases = list(
-        filter(lambda x: x.has_description, problemset.problems[0].test_cases)
+    problem_a = next(
+        problem for problem in problemset.problems if problem.name == "problem_a"
     )
-    assert len(desc_test_cases) == 1
-    desc_test_case = desc_test_cases[0]
+    assert len(problemset.problems) == 2
+    assert len(problem_a.test_cases) == 5
+    a_desc_test_cases = list(filter(lambda x: x.has_description, problem_a.test_cases))
+    assert len(a_desc_test_cases) == 1
+    desc_test_case = a_desc_test_cases[0]
     assert desc_test_case.name == "2"
     assert desc_test_case.dir_path.endswith("data/secret")
     assert desc_test_case.input_lines == ["Secret case\n", "with more than one line"]
@@ -30,7 +30,7 @@ def test_scenario_1(scenarios_path):
         "this is a description with a blank line\n",
     ]
     assert desc_test_case.image_extension is None
-    assert len(problemset.problems[0].submissions) == 3
-    assert len(problemset.problems[0].ac_submissions) == 2
-    assert len(problemset.problems[0].wa_submissions) == 1
-    assert len(problemset.problems[0].tle_submissions) == 0
+    assert len(problem_a.submissions) == 3
+    assert len(problem_a.ac_submissions) == 2
+    assert len(problem_a.wa_submissions) == 1
+    assert len(problem_a.tle_submissions) == 0

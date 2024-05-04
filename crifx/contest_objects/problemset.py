@@ -8,7 +8,8 @@ class ProblemSet:
     """Data structure and manager for a problem set."""
 
     def __init__(self, problems: list[Problem]):
-        self.problems = problems
+        sorted_problems = sorted(problems, key=lambda x: x.name)
+        self.problems = sorted_problems
 
     def submission_authors(self) -> list[Judge]:
         """Get the set of authors that have contributed at least one submission."""
