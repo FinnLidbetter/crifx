@@ -19,10 +19,15 @@ def tmp_file_path(tmp_path):
 
 
 @pytest.fixture
-def scenarios_path(request):
+def examples_path(pytestconfig):
+    """Get the path to the examples directory."""
+    yield os.path.join(pytestconfig.rootpath, "examples")
+
+
+@pytest.fixture
+def scenarios_path(pytestconfig):
     """Get the path to the scenarios directory."""
-    tests_path = os.path.dirname(request.module.__file__)
-    yield os.path.join(tests_path, "scenarios")
+    yield os.path.join(pytestconfig.rootpath, "tests", "scenarios")
 
 
 @pytest.fixture

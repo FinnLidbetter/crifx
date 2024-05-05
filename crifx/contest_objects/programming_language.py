@@ -22,7 +22,7 @@ class ProgrammingLanguage(Enum):
             case ProgrammingLanguage.C:
                 return ["c"]
             case ProgrammingLanguage.CPP:
-                return ["cc", "cpp"]
+                return ["cc", "cpp", "cxx", "C"]
             case ProgrammingLanguage.PYTHON:
                 return ["py"]
             case ProgrammingLanguage.JAVA:
@@ -43,6 +43,14 @@ class ProgrammingLanguage(Enum):
         for programming_language_str in ProgrammingLanguage:
             programming_language = ProgrammingLanguage(programming_language_str)
             if extension in programming_language.file_extensions():
+                return programming_language
+        return None
+
+    @staticmethod
+    def from_language_name(language_name: str) -> Union["ProgrammingLanguage", None]:
+        """Get the programming language from a language name string."""
+        for programming_language in ProgrammingLanguage:
+            if language_name.lower() == programming_language.value.lower():
                 return programming_language
         return None
 

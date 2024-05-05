@@ -1,0 +1,77 @@
+# Crifx configuration file example.
+
+github_repo_url = "https://github.com/FinnLidbetter/crifx"
+
+# Section for defining minimum numbers of submissions and manual reviews.
+[review_requirements]
+# There must be AC submissions from at least 3 distinct judges.
+independent_ac = 3
+# There must be at least 2 distinct language groups with at least one AC
+# submission written in a language in the group.
+language_groups = 2
+# There must be at least one wrong_answer submission.
+submissions_wa = 1
+# There must be at least one time_limit_exceeded submission.
+submissions_tle = 1
+# There must be at least 3 judges who have reviewed the problem statement.
+statement_reviewers = 3
+# There must be at least 2 judges who have reviewed the input validators.
+validators_reviewers = 2
+# There must be at least 2 judges who have reviewed the test data.
+data_reviewers = 2
+
+# Section for defining language groups.
+[[language_groups]]
+# Non alphanumeric characters can be used in the language group name crifx
+# the language group name is written in double quotes "".
+[language_groups."c/c++"]
+# The names of the languages in the group. Language names are cast to
+# lowercase before comparison to language names known to crifx.
+languages = ["C", "C++"]
+# The number of AC submissions required for this group.
+required_ac_count = 0
+
+[language_groups."java/kotlin"]
+languages = ["Java", "Kotlin"]
+required_ac_count = 0
+
+[language_groups.python]
+languages = ["Python"]
+required_ac_count = 0
+
+[[problems]]
+# A new table can be defined for each problem.
+# It is recommended to list judge names on separate lines to help avoid merge
+# conflicts in git.
+[problems.helloworld]
+github_issue_id = 1
+[problems.helloworld.review_status]
+# List of names of judges who have reviewed the problem statement.
+statement_reviewed_by = [
+    "Alice",
+    "Bob",
+    "Jane Doe",
+]
+# List of names of judges who have reviewed the input validator(s).
+validators_reviewed_by = [
+    "Homer Simpson",
+]
+# List of names of judges who have reviewed the test data.
+data_reviewed_by = [
+    "Homer Simpson",
+    "Bob",
+]
+
+[problems.addtwonumbers]
+# github_issue_id is not required.
+# github_issue_id =
+[problems.addtwonumbers.review_status]
+statement_reviewed_by = [
+
+]
+validators_reviewed_by = [
+
+]
+data_reviewed_by = [
+
+]
