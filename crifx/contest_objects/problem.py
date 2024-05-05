@@ -10,7 +10,7 @@ from crifx.contest_objects.programming_language import ProgrammingLanguage
 from crifx.contest_objects.submission import Submission
 
 
-@dataclass
+@dataclass(frozen=True)
 class Problem:
     """Data for a Problem."""
 

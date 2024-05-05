@@ -153,18 +153,20 @@ class Config:
             toml_dict.get("review_requirements", {}),
         )
         self.language_group_configs = []
-        for group_identifier in toml_dict.get("language_groups", []):
+        language_groups = toml_dict.get("language_groups", {})
+        for group_identifier, language_group_dict in language_groups.items():
             language_group_config = LanguageGroupConfig.from_toml_dict(
-                toml_dict.get("language_groups").get(group_identifier), group_identifier
+                language_group_dict, group_identifier
             )
             if not language_group_config.language_group.languages:
                 # No languages parsed from the language group.
                 continue
             self.language_group_configs.append(language_group_config)
         self.problem_configs = []
-        for problem_name in toml_dict.get("problems", []):
+        problems = toml_dict.get("problems", {})
+        for problem_name, problem_dict in problems.items():
             problem_review_status = ProblemConfig.from_toml_dict(
-                toml_dict.get("problems").get(problem_name), problem_name
+                problem_dict, problem_name
             )
             self.problem_configs.append(problem_review_status)
         self.problem_configs.sort(key=lambda x: x.name)

@@ -21,7 +21,7 @@ validators_reviewers = 2
 data_reviewers = 2
 
 # Section for defining language groups.
-[[language_groups]]
+[language_groups]
 # Non alphanumeric characters can be used in the language group name crifx
 # the language group name is written in double quotes "".
 [language_groups."c/c++"]
@@ -39,7 +39,7 @@ required_ac_count = 0
 languages = ["Python"]
 required_ac_count = 0
 
-[[problems]]
+[problems]
 # A new table can be defined for each problem.
 # It is recommended to list judge names on separate lines to help avoid merge
 # conflicts in git.

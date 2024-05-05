@@ -63,6 +63,7 @@ class ProblemSetParser:
         """Parse a problem object from a problem directory."""
         _, name = os.path.split(problem_root_dir)
         problem_test_cases = self._parse_problem_test_cases(problem_root_dir)
+        problem_test_cases.sort(key=lambda x: x.sort_key())
         submissions = self._parse_submissions(problem_root_dir)
         return Problem(name, problem_test_cases, submissions)
 
@@ -94,12 +95,14 @@ class ProblemSetParser:
         for in_filename in in_files:
             if in_filename not in ans_files:
                 logging.warning(
-                    "Input file %s.in has no corresponding .ans file.", in_filename
+                    "Input file %s.in has no corresponding .ans file.",
+                    os.path.join(test_case_dir, in_filename),
                 )
         for ans_filename in ans_files:
             if ans_filename not in in_files:
                 logging.warning(
-                    "Answer file %s.ans has no corresponding .in file.", ans_filename
+                    "Answer file %s.ans has no corresponding .in file.",
+                    os.path.join(test_case_dir, ans_filename),
                 )
         for filename in in_files:
             if filename not in ans_files:

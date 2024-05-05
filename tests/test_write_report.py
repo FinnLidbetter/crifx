@@ -2,6 +2,7 @@
 
 import os
 
+from crifx.config_parser import Config
 from crifx.contest_objects import ProblemSet
 from crifx.git_manager import GitManager
 from crifx.report_writer import ReportWriter
@@ -12,7 +13,8 @@ def test_write_report(tmp_path, scenarios_path):
     assert not os.listdir(tmp_path)
     problemset = ProblemSet([])
     git_manager = GitManager(scenarios_path)
-    writer = ReportWriter(problemset, git_manager)
+    config = Config({})
+    writer = ReportWriter(problemset, config, git_manager)
     writer.build_report(tmp_path)
     writer.write_tex(tmp_path)
     expected_file = "crifx-report.tex"

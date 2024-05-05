@@ -5,6 +5,7 @@ import logging
 import os
 import sys
 
+from crifx.config_parser import parse_config
 from crifx.dir_layout_parsing import find_contest_problems_root
 from crifx.git_manager import GitManager
 from crifx.problemset_parser import ProblemSetParser
@@ -55,7 +56,8 @@ def main():
     git_manager = GitManager(problemset_root_path)
     problemset_parser = ProblemSetParser(problemset_root_path, git_manager)
     problemset = problemset_parser.parse_problemset()
-    writer = ReportWriter(problemset, git_manager)
+    config = parse_config(problemset_root_path)
+    writer = ReportWriter(problemset, config, git_manager)
     writer.build_report(crifx_dir_path)
     writer.write_tex(crifx_dir_path)
     writer.write_pdf(problemset_root_path)

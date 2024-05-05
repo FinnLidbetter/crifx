@@ -45,3 +45,7 @@ class ProblemTestCase:
         if self.image_extension is None:
             return None
         return self._get_path(self.image_extension)
+
+    def sort_key(self) -> tuple[bool, str, str]:
+        """Get the sort key for this test case."""
+        return not self.is_sample, self.dir_path, self.name
