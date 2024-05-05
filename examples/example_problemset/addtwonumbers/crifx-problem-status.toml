@@ -1,0 +1,17 @@
+
+# This problem is not yet ready for problemtools verifyproblem runs.
+run_problemtools = false
+
+# github_issue_id is not required.
+# github_issue_id =
+
+[review_status]
+statement_reviewed_by = [
+
+]
+validators_reviewed_by = [
+
+]
+data_reviewed_by = [
+
+]

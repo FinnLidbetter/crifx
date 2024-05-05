@@ -1,6 +1,7 @@
 """Tests for methods on the Problem object."""
 
 from crifx.contest_objects import Judgement, Problem, ProgrammingLanguage
+from crifx.report_objects import DEFAULT_REVIEW_STATUS
 
 
 def test_language_count(make_judged_lang_submission):
@@ -23,7 +24,10 @@ def test_language_count(make_judged_lang_submission):
         Judgement.RUN_TIME_ERROR, ProgrammingLanguage.RUST
     )
     problem = Problem(
-        "problem", [], [ac_java_1, tle_kotlin, wa_java, rte_rust, ac_c, ac_java_2]
+        "problem",
+        [],
+        [ac_java_1, tle_kotlin, wa_java, rte_rust, ac_c, ac_java_2],
+        DEFAULT_REVIEW_STATUS,
     )
     ac_languages = problem.ac_languages()
     assert ac_languages == {ProgrammingLanguage.JAVA: 2, ProgrammingLanguage.C: 1}
@@ -35,7 +39,7 @@ def test_language_count(make_judged_lang_submission):
     assert problem.wa_submissions == [wa_java]
     assert problem.tle_submissions == [tle_kotlin]
     assert problem.rte_submissions == [rte_rust]
-    problem = Problem("problem", [], [])
+    problem = Problem("problem", [], [], DEFAULT_REVIEW_STATUS)
     ac_languages = problem.ac_languages()
     assert ac_languages == {}
     assert problem.ac_submissions == []
@@ -64,11 +68,20 @@ def test_independent_author_count(make_authored_submission):
     bob_java_tle = make_authored_submission(
         "Bob", "bob", Judgement.TIME_LIMIT_EXCEEDED, ProgrammingLanguage.JAVA
     )
-    problem = Problem("problem", [], [finn_java_ac_1, alice_c_ac, bob_java_tle])
+    problem = Problem(
+        "problem", [], [finn_java_ac_1, alice_c_ac, bob_java_tle], DEFAULT_REVIEW_STATUS
+    )
     assert problem.independent_ac_count() == 2
-    problem = Problem("problem", [], [finn_java_ac_1, finn_rust_ac])
+    problem = Problem(
+        "problem", [], [finn_java_ac_1, finn_rust_ac], DEFAULT_REVIEW_STATUS
+    )
     assert problem.independent_ac_count() == 1
-    problem = Problem("problem", [], [alice_c_wa, bob_java_tle])
+    problem = Problem("problem", [], [alice_c_wa, bob_java_tle], DEFAULT_REVIEW_STATUS)
     assert problem.independent_ac_count() == 0
-    problem = Problem("problem", [], [finn_java_ac_1, finn_java_ac_2, bob_java_tle])
+    problem = Problem(
+        "problem",
+        [],
+        [finn_java_ac_1, finn_java_ac_2, bob_java_tle],
+        DEFAULT_REVIEW_STATUS,
+    )
     assert problem.independent_ac_count() == 1

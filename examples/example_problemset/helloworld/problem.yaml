@@ -2,5 +2,6 @@ name: Hello World
 author: Finn Lidbetter
 license: cc by-sa
 validation: default
+validator_flags: case_sensitive
 limits:
   time_multiplier: 2.0

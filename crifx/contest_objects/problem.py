@@ -8,6 +8,7 @@ from crifx.contest_objects.judgement import Judgement
 from crifx.contest_objects.problem_test_case import ProblemTestCase
 from crifx.contest_objects.programming_language import ProgrammingLanguage
 from crifx.contest_objects.submission import Submission
+from crifx.report_objects import ReviewStatus
 
 
 @dataclass(frozen=True)
@@ -17,6 +18,7 @@ class Problem:
     name: str
     test_cases: list[ProblemTestCase]
     submissions: list[Submission]
+    review_status: ReviewStatus
 
     def _get_submissions_with_judgement(self, judgement):
         return list(filter(lambda x: x.judgement is judgement, self.submissions))

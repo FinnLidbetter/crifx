@@ -1,5 +1,7 @@
 # Crifx configuration file example.
 
+# The github repository url for this problemset. This can be used to include
+# hyperlinks to GitHub Issues for each problem in the report.
 github_repo_url = "https://github.com/FinnLidbetter/crifx"
 
 # Section for defining minimum numbers of submissions and manual reviews.
@@ -38,40 +40,3 @@ required_ac_count = 0
 [language_groups.python]
 languages = ["Python"]
 required_ac_count = 0
-
-[problems]
-# A new table can be defined for each problem.
-# It is recommended to list judge names on separate lines to help avoid merge
-# conflicts in git.
-[problems.helloworld]
-github_issue_id = 1
-[problems.helloworld.review_status]
-# List of names of judges who have reviewed the problem statement.
-statement_reviewed_by = [
-    "Alice",
-    "Bob",
-    "Jane Doe",
-]
-# List of names of judges who have reviewed the input validator(s).
-validators_reviewed_by = [
-    "Homer Simpson",
-]
-# List of names of judges who have reviewed the test data.
-data_reviewed_by = [
-    "Homer Simpson",
-    "Bob",
-]
-
-[problems.addtwonumbers]
-# github_issue_id is not required.
-# github_issue_id =
-[problems.addtwonumbers.review_status]
-statement_reviewed_by = [
-
-]
-validators_reviewed_by = [
-
-]
-data_reviewed_by = [
-
-]

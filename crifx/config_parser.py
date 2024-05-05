@@ -100,50 +100,6 @@ class LanguageGroupConfig:
         )
 
 
-@dataclass(frozen=True)
-class ProblemReviewStatus:
-    """Metadata for tracking who has reviewed different parts of a problem."""
-
-    # A list of names of judges who have reviewed the problem statement.
-    statement_reviewed_by: list[str]
-    # A list of names of judges who have reviewed the input validator(s).
-    validators_reviewed_by: list[str]
-    # A list of names of judges who have reviewed the test data.
-    data_reviewed_by: list[str]
-
-    @staticmethod
-    def from_toml_dict(toml_dict: dict[str, Any]) -> "ProblemReviewStatus":
-        """Create a ProblemReviewStatus from a toml configuration dict."""
-        return ProblemReviewStatus(
-            statement_reviewed_by=toml_dict.get("statement_reviewed_by", []),
-            validators_reviewed_by=toml_dict.get("validators_reviewed_by", []),
-            data_reviewed_by=toml_dict.get("data_reviewed_by", []),
-        )
-
-
-@dataclass(frozen=True)
-class ProblemConfig:
-    """Configuration data for a problem in a problem set."""
-
-    # The name of the problem.
-    name: str
-    # The github issue id associated with the problem.
-    github_issue_id: int | None
-    # Tracking information about who has reviewed different parts of the problem.
-    review_status: ProblemReviewStatus
-
-    @staticmethod
-    def from_toml_dict(toml_dict: dict[str, Any], problem_name: str):
-        """Create a ProblemConfig from a toml dict."""
-        return ProblemConfig(
-            name=problem_name,
-            github_issue_id=toml_dict.get("github_issue_id"),
-            review_status=ProblemReviewStatus.from_toml_dict(
-                toml_dict.get("review_status", {})
-            ),
-        )
-
-
 class Config:
     """Configuration for crifx requirements and review status."""
 
@@ -162,14 +118,6 @@ class Config:
                 # No languages parsed from the language group.
                 continue
             self.language_group_configs.append(language_group_config)
-        self.problem_configs = []
-        problems = toml_dict.get("problems", {})
-        for problem_name, problem_dict in problems.items():
-            problem_review_status = ProblemConfig.from_toml_dict(
-                problem_dict, problem_name
-            )
-            self.problem_configs.append(problem_review_status)
-        self.problem_configs.sort(key=lambda x: x.name)
 
 
 def parse_config(problemset_root_path: str) -> Config:

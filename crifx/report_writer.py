@@ -13,6 +13,8 @@ from pylatex import (
     Subsection,
     Tabular,
 )
+from pylatex.base_classes import Environment
+from pylatex.package import Package
 
 from crifx.config_parser import Config
 from crifx.contest_objects import Problem, ProblemSet
@@ -20,6 +22,23 @@ from crifx.git_manager import GitManager
 
 MARGIN = "2cm"
 REPORT_FILENAME = "crifx-report"
+INPUT_FILE_LINES_MAX = 10
+INPUT_FILE_WIDTH_MAX = 120
+
+LISTING_OPTIONS = [
+    NoEscape(r"basicstyle=\footnotesize"),
+    NoEscape(r"backgroundcolor=\color{lightgray}"),
+    "framexleftmargin=1em",
+    "framexrightmargin=1em",
+]
+
+
+class LstListing(Environment):
+    """LstListing environment."""
+
+    packages = [Package("listings")]
+    escape = False
+    content_separator = "\n"
 
 
 class ReportWriter:
@@ -116,7 +135,22 @@ class ReportWriter:
         """Write the details for a problem."""
         doc.append(Command(r"newpage"))
         with doc.create(Section(problem.name)):
+            with doc.create(Subsection("Problemtools verifyproblem output")):
+                if problem.review_status.run_problemtools:
+                    doc.append("null")
+                else:
+                    doc.append(
+                        "Including problemtools verifyproblem output is disabled "
+                        "for this problem. It can be enabled in the "
+                        "crifx-problem-status.toml file for this problem."
+                    )
             with doc.create(Subsection("Test Cases")):
+                doc.append(
+                    "Test case descriptions are rendered below if they exist. "
+                    f"Otherwise, the first {INPUT_FILE_LINES_MAX} lines of input "
+                    f"are rendered if they each have at most {INPUT_FILE_WIDTH_MAX} "
+                    "characters."
+                )
                 with doc.create(Itemize()) as itemize:
                     for test_case in problem.test_cases:
                         itemize.add_item(test_case.name)
@@ -128,17 +162,31 @@ class ReportWriter:
                                 Command(
                                     "lstinputlisting",
                                     NoEscape(desc_filepath),
-                                    options=[
-                                        NoEscape(r"basicstyle=\footnotesize"),
-                                        NoEscape(r"backgroundcolor=\color{lightgray}"),
-                                        "framexleftmargin=1em",
-                                        "framexrightmargin=1em",
-                                    ],
+                                    options=LISTING_OPTIONS,
                                 )
                             )
-
-            with doc.create(Subsection("Problemtools verifyproblem output")):
-                doc.append("null")
+                        else:
+                            if all(
+                                len(line) <= INPUT_FILE_WIDTH_MAX
+                                for line in test_case.input_lines[:INPUT_FILE_LINES_MAX]
+                            ):
+                                truncated_input = "".join(test_case.input_lines[:10])
+                                with doc.create(LstListing(options=LISTING_OPTIONS)):
+                                    doc.append(
+                                        truncated_input,
+                                    )
+                                lines_remaining = (
+                                    len(test_case.input_lines) - INPUT_FILE_LINES_MAX
+                                )
+                                if lines_remaining > 0:
+                                    doc.append(
+                                        f"The remaining {lines_remaining} lines have not been rendered "
+                                        f"for brevity."
+                                    )
+                            else:
+                                doc.append(
+                                    "Input file lines are too long to render here."
+                                )
 
     def write_tex(self, dirpath: str):
         """Write the tex output."""

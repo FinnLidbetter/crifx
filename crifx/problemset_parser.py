@@ -2,6 +2,8 @@
 
 import logging
 import os
+import tomllib
+from typing import Any
 
 from crifx.contest_objects import (
     UNKNOWN_JUDGE,
@@ -15,8 +17,14 @@ from crifx.contest_objects import (
 )
 from crifx.dir_layout_parsing import get_problem_root_dirs, is_contest_problems_root
 from crifx.git_manager import GitManager
+from crifx.report_objects import (
+    DEFAULT_REVIEW_STATUS,
+    DEFAULT_REVIEW_STATUS_TOML,
+    ReviewStatus,
+)
 
 TEST_CASE_IMAGE_EXTENSIONS = ["png", "jpg", "jpeg"]
+PROBLEM_REVIEW_STATUS_FILENAME = "crifx-problem-status.toml"
 
 
 class ProblemSetParser:
@@ -65,7 +73,8 @@ class ProblemSetParser:
         problem_test_cases = self._parse_problem_test_cases(problem_root_dir)
         problem_test_cases.sort(key=lambda x: x.sort_key())
         submissions = self._parse_submissions(problem_root_dir)
-        return Problem(name, problem_test_cases, submissions)
+        review_status = self._parse_review_status(problem_root_dir)
+        return Problem(name, problem_test_cases, submissions, review_status)
 
     def _parse_problem_test_cases(self, problem_root_dir: str) -> list[ProblemTestCase]:
         """Parse the problem test cases from a problem directory."""
@@ -197,3 +206,61 @@ class ProblemSetParser:
             )
             submissions.append(submission)
         return submissions
+
+    def _parse_review_status(self, problem_root_dir: str) -> ReviewStatus:
+        """Parse the problem review status."""
+        review_status_path = os.path.join(
+            problem_root_dir,
+            PROBLEM_REVIEW_STATUS_FILENAME,
+        )
+        if not os.path.exists(review_status_path):
+            with open(review_status_path, "w") as review_status_file:
+                review_status_file.write(DEFAULT_REVIEW_STATUS_TOML)
+        try:
+            with open(review_status_path, "rb") as review_status_file:
+                toml_dict = tomllib.load(review_status_file)
+        except (PermissionError, FileNotFoundError, FileExistsError):
+            logging.exception(
+                "Failed to read problem review status file at path '%s'.",
+                review_status_path,
+            )
+            return DEFAULT_REVIEW_STATUS
+        github_issue_id = toml_dict.get("github_issue_id")
+        if not isinstance(github_issue_id, int):
+            github_issue_id = None
+        run_problemtools = bool(toml_dict.get("run_problemtools", False))
+        review_status_dict = toml_dict.get("review_status", {})
+        statement_reviewed_by = _read_reviewers(
+            review_status_dict, "statement_reviewed_by", review_status_path
+        )
+        validators_reviewed_by = _read_reviewers(
+            review_status_dict, "validators_reviewed_by", review_status_path
+        )
+        data_reviewed_by = _read_reviewers(
+            review_status_dict, "data_reviewed_by", review_status_path
+        )
+        return ReviewStatus(
+            github_issue_id,
+            run_problemtools,
+            statement_reviewed_by,
+            validators_reviewed_by,
+            data_reviewed_by,
+        )
+
+
+def _read_reviewers(
+    review_status_dict: dict[str, Any], reviewer_str: str, path: str
+) -> list[str]:
+    """Get a list of reviewers strings from a toml dictionary."""
+    reviewers = review_status_dict.get(reviewer_str, [])
+    if not isinstance(reviewers, list) or not all(
+        isinstance(val, str) for val in reviewers
+    ):
+        logging.error(
+            "%s [review_status] %s should be a list of strings, but instead it is %s",
+            path,
+            reviewer_str,
+            reviewers,
+        )
+        reviewers = []
+    return reviewers
