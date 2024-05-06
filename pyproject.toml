@@ -27,7 +27,9 @@ classifiers = [
 crifx = "crifx.cli:main"
 
 [project.optional-dependencies]
+docker = ["docker"]
 dev = ["black", "ruff", "tox", "mypy", "pytest"]
+all = ["docker", "black", "ruff", "tox", "mypy", "pytest"]
 
 [tool.black]
 line_length = 88

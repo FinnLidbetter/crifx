@@ -60,3 +60,7 @@ class LanguageGroup:
 
     def __init__(self, *languages: ProgrammingLanguage):
         self.languages = tuple(sorted(languages, key=lambda x: x.value))
+
+    def has_language(self, language: ProgrammingLanguage) -> bool:
+        """Return True if the given language is in the group."""
+        return language in self.languages

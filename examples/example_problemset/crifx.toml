@@ -18,7 +18,7 @@ submissions_tle = 1
 # There must be at least 3 judges who have reviewed the problem statement.
 statement_reviewers = 3
 # There must be at least 2 judges who have reviewed the input validators.
-validators_reviewers = 2
+validator_reviewers = 2
 # There must be at least 2 judges who have reviewed the test data.
 data_reviewers = 2
 

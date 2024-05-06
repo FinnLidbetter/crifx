@@ -8,6 +8,7 @@ from pylatex import (
     Document,
     Enumerate,
     Itemize,
+    MultiColumn,
     NoEscape,
     Section,
     Subsection,
@@ -23,7 +24,7 @@ from crifx.git_manager import GitManager
 MARGIN = "2cm"
 REPORT_FILENAME = "crifx-report"
 INPUT_FILE_LINES_MAX = 10
-INPUT_FILE_WIDTH_MAX = 120
+INPUT_FILE_WIDTH_MAX = 90
 
 LISTING_OPTIONS = [
     NoEscape(r"basicstyle=\footnotesize"),
@@ -61,19 +62,20 @@ class ReportWriter:
             "rmargin": MARGIN,
             "bmargin": MARGIN,
         }
-        doc = Document(report_tex_path, geometry_options=geometry_options)
-        self._set_preamble(doc)
-        self._write_body(doc)
-        self.doc = doc
-        return doc
+        self.doc = Document(report_tex_path, geometry_options=geometry_options)
+        self._set_preamble()
+        self._write_body()
+        return self.doc
 
-    def _set_preamble(self, doc: Document):
+    def _set_preamble(self):
         """Set the preamble for the tex document."""
         git_short_commit_id = self.git_manager.get_short_commit_id()
-        doc.preamble.append(Command("usepackage", "datetime2"))
-        doc.preamble.append(Command("usepackage", "listings"))
-        doc.preamble.append(Command("title", "CRIFX Contest Preparation Status Report"))
-        doc.preamble.append(
+        self.doc.preamble.append(Command("usepackage", "datetime2"))
+        self.doc.preamble.append(Command("usepackage", "listings"))
+        self.doc.preamble.append(
+            Command("title", "CRIFX Contest Preparation Status Report")
+        )
+        self.doc.preamble.append(
             Command(
                 "date",
                 NoEscape(
@@ -83,45 +85,156 @@ class ReportWriter:
             )
         )
 
-    def _write_body(self, doc: Document):
+    def _write_body(self):
         """Write the body of the document."""
-        doc.append(NoEscape(r"\maketitle"))
-        self._write_summary_table(doc)
-        self._write_how_can_i_help(doc)
+        self.doc.append(NoEscape(r"\maketitle"))
+        self._write_summary_table()
+        self._write_how_can_i_help()
         for problem in self.problem_set.problems:
-            self._write_problem_details(doc, problem)
+            self._write_problem_details(problem)
 
-    def _write_summary_table(self, doc: Document):
+    def _write_summary_table(self):
         """Write the summary table for the document."""
-        with doc.create(Tabular("|l|c|c|c|c|c|")) as table:
+        language_group_configs = self.crifx_config.language_group_configs
+        language_groups = [
+            group_config.language_group for group_config in language_group_configs
+        ]
+        requirements = self.crifx_config.review_requirements
+        show_statement_reviews = requirements.statement_reviewers > 0
+        show_validator_reviews = requirements.validator_reviewers > 0
+        show_data_reviews = requirements.data_reviewers > 0
+        review_columns = (
+            int(show_statement_reviews)
+            + int(show_validator_reviews)
+            + int(show_data_reviews)
+        )
+        num_columns = 7 + len(language_group_configs) + review_columns
+        column_spec = "|l|" + "c|" * (num_columns - 1)
+        with self.doc.create(Tabular(column_spec)) as table:
             table.add_hline()
+            header_group_row = [
+                # Problem
+                "",
+                # Independent, Groups, language_groups, Sum
+                MultiColumn(
+                    3 + len(language_group_configs),
+                    align="c",
+                    data=NoEscape(r"{\tiny Solutions}"),
+                ),
+                # WA, TLE
+                MultiColumn(2, align="|c|", data=NoEscape(r"{\tiny Non-solutions}")),
+                # Test cases
+                "",
+            ]
+            if review_columns > 0:
+                header_group_row.append(
+                    MultiColumn(
+                        review_columns,
+                        align="c",
+                        data=NoEscape(r"{\tiny Manual Reviews}"),
+                    )
+                )
+            table.add_row(header_group_row, color="cyan")
+            table.add_hline()
+            header_row = [
+                NoEscape(r"{\tiny Problem}"),
+                NoEscape(r"{\tiny Independent}"),
+                NoEscape(r"{\tiny Groups}"),
+            ]
+            for language_group_config in language_group_configs:
+                header_row.append(
+                    NoEscape(r"{\tiny " + language_group_config.identifier + r"}")
+                )
+            header_row.extend(
+                [
+                    NoEscape(r"{\tiny Sum}"),
+                    NoEscape(r"{\tiny WA}"),
+                    NoEscape(r"{\tiny TLE}"),
+                    NoEscape(r"{\tiny Test Files}"),
+                ]
+            )
+            if show_statement_reviews:
+                header_row.append(NoEscape(r"{\tiny Statement}"))
+            if show_validator_reviews:
+                header_row.append(NoEscape(r"{\tiny Validator(s)}"))
+            if show_data_reviews:
+                header_row.append(NoEscape(r"{\tiny Data}"))
             table.add_row(
-                ["Problem", "Independent Solves", "AC", "WA", "TLE", "Test Cases"],
+                header_row,
                 color="cyan",
             )
             table.add_hline()
             for problem in self.problem_set.problems:
-                # colour_independent_count = NoEscape(r"\cellcolor{green}" + str(problem.independent_ac_count()))
-                table.add_row(
+                row = [
+                    problem.name,
+                    self._coloured_cell(
+                        problem.independent_ac_count(), requirements.independent_ac
+                    ),
+                    self._coloured_cell(
+                        problem.language_groups_ac_covered(language_groups),
+                        requirements.language_groups_ac,
+                    ),
+                ]
+                for language_group_config in language_group_configs:
+                    language_group = language_group_config.language_group
+                    count = 0
+                    for ac_submission in problem.ac_submissions:
+                        if language_group.has_language(ac_submission.language):
+                            count += 1
+                    row.append(
+                        self._coloured_cell(
+                            count, language_group_config.required_ac_count
+                        )
+                    )
+                row.extend(
                     [
-                        problem.name,
-                        problem.independent_ac_count(),
                         len(problem.ac_submissions),
                         len(problem.wa_submissions),
                         len(problem.tle_submissions),
                         len(problem.test_cases),
                     ]
                 )
+                if show_statement_reviews:
+                    row.append(
+                        self._coloured_cell(
+                            len(problem.review_status.statement_reviewed_by),
+                            requirements.statement_reviewers,
+                        )
+                    )
+                if show_validator_reviews:
+                    row.append(
+                        self._coloured_cell(
+                            len(problem.review_status.validators_reviewed_by),
+                            requirements.validator_reviewers,
+                        )
+                    )
+                if show_data_reviews:
+                    row.append(
+                        self._coloured_cell(
+                            len(problem.review_status.data_reviewed_by),
+                            requirements.data_reviewers,
+                        )
+                    )
+                table.add_row(row)
                 table.add_hline()
 
-    def _write_how_can_i_help(self, doc: Document):
+    @staticmethod
+    def _coloured_cell(value, requirement):
+        if requirement == 0:
+            return value
+        if value < requirement:
+            return NoEscape(r"\cellcolor{red}" + f"{value}/{requirement}")
+        else:
+            return NoEscape(r"\cellcolor{green}" + f"{value}/{requirement}")
+
+    def _write_how_can_i_help(self):
         """Write the 'How can I help?' section."""
-        with doc.create(Section("How can I help?")):
-            doc.append(
+        with self.doc.create(Section("How can I help?")):
+            self.doc.append(
                 "TODO: replace these with more specific suggestions based on "
                 "what is present and what is still required."
             )
-            with doc.create(Enumerate()) as enum_env:
+            with self.doc.create(Enumerate()) as enum_env:
                 enum_env.add_item("Write AC submissions")
                 enum_env.add_item("Add test data")
                 enum_env.add_item("Add WA submissions")
@@ -131,27 +244,28 @@ class ReportWriter:
                 enum_env.add_item("Review test data")
                 enum_env.add_item("Review input validators")
 
-    def _write_problem_details(self, doc: Document, problem: Problem):
+    def _write_problem_details(self, problem: Problem):
         """Write the details for a problem."""
-        doc.append(Command(r"newpage"))
-        with doc.create(Section(problem.name)):
-            with doc.create(Subsection("Problemtools verifyproblem output")):
+        assert self.doc is not None
+        self.doc.append(Command(r"newpage"))
+        with self.doc.create(Section(problem.name)):
+            with self.doc.create(Subsection("Problemtools verifyproblem output")):
                 if problem.review_status.run_problemtools:
-                    doc.append("null")
+                    self.doc.append("null")
                 else:
-                    doc.append(
+                    self.doc.append(
                         "Including problemtools verifyproblem output is disabled "
                         "for this problem. It can be enabled in the "
                         "crifx-problem-status.toml file for this problem."
                     )
-            with doc.create(Subsection("Test Cases")):
-                doc.append(
+            with self.doc.create(Subsection("Test Cases")):
+                self.doc.append(
                     "Test case descriptions are rendered below if they exist. "
                     f"Otherwise, the first {INPUT_FILE_LINES_MAX} lines of input "
                     f"are rendered if they each have at most {INPUT_FILE_WIDTH_MAX} "
                     "characters."
                 )
-                with doc.create(Itemize()) as itemize:
+                with self.doc.create(Itemize()) as itemize:
                     for test_case in problem.test_cases:
                         itemize.add_item(test_case.name)
                         if test_case.has_description:
@@ -171,21 +285,23 @@ class ReportWriter:
                                 for line in test_case.input_lines[:INPUT_FILE_LINES_MAX]
                             ):
                                 truncated_input = "".join(test_case.input_lines[:10])
-                                with doc.create(LstListing(options=LISTING_OPTIONS)):
-                                    doc.append(
+                                with self.doc.create(
+                                    LstListing(options=LISTING_OPTIONS)
+                                ):
+                                    self.doc.append(
                                         truncated_input,
                                     )
                                 lines_remaining = (
                                     len(test_case.input_lines) - INPUT_FILE_LINES_MAX
                                 )
                                 if lines_remaining > 0:
-                                    doc.append(
+                                    self.doc.append(
                                         f"The remaining {lines_remaining} lines have not been rendered "
                                         f"for brevity."
                                     )
                             else:
-                                doc.append(
-                                    "Input file lines are too long to render here."
+                                self.doc.append(
+                                    "\nInput file lines are too long to render here."
                                 )
 
     def write_tex(self, dirpath: str):

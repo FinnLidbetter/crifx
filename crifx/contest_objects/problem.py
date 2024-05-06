@@ -6,7 +6,10 @@ from dataclasses import dataclass
 from crifx.contest_objects.judge import Judge
 from crifx.contest_objects.judgement import Judgement
 from crifx.contest_objects.problem_test_case import ProblemTestCase
-from crifx.contest_objects.programming_language import ProgrammingLanguage
+from crifx.contest_objects.programming_language import (
+    LanguageGroup,
+    ProgrammingLanguage,
+)
 from crifx.contest_objects.submission import Submission
 from crifx.report_objects import ReviewStatus
 
@@ -58,3 +61,17 @@ class Problem:
         for submission in self.ac_submissions:
             language_counts[submission.language] += 1
         return language_counts
+
+    def language_groups_ac_covered(self, language_groups: list[LanguageGroup]):
+        """Get the number of language groups that have at least one AC submission."""
+        groups_covered = 0
+        ac_languages = self.ac_languages()
+        for language_group in language_groups:
+            covered = False
+            for language, count in ac_languages.items():
+                if count > 0 and language_group.has_language(language):
+                    covered = True
+                    break
+            if covered:
+                groups_covered += 1
+        return groups_covered
