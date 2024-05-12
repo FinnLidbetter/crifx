@@ -311,13 +311,13 @@ class ReportWriter:
                     enum_env.add_item(
                         f"{problem.name} needs at least one more AC submission from "
                         f"any of the following language groups: "
-                        f"{self._oxford_or(groups_not_covered_names)}"
+                        f"{self._oxford_or(groups_not_covered_names)}."
                     )
                 else:
                     enum_env.add_item(
                         f"{problem.name} needs at least {groups_needed_num} more AC "
                         f"submissions from any of the following language groups: "
-                        f"{self._oxford_or(groups_not_covered_names)}"
+                        f"{self._oxford_or(groups_not_covered_names)}."
                     )
 
     def _write_how_can_i_help(self):
