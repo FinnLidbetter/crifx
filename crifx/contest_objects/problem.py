@@ -64,7 +64,7 @@ class Problem:
 
     def language_groups_ac_covered(self, language_groups: list[LanguageGroup]):
         """Get the number of language groups that have at least one AC submission."""
-        groups_covered = 0
+        groups_covered = []
         ac_languages = self.ac_languages()
         for language_group in language_groups:
             covered = False
@@ -73,5 +73,5 @@ class Problem:
                     covered = True
                     break
             if covered:
-                groups_covered += 1
+                groups_covered.append(language_group)
         return groups_covered

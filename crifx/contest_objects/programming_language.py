@@ -64,3 +64,11 @@ class LanguageGroup:
     def has_language(self, language: ProgrammingLanguage) -> bool:
         """Return True if the given language is in the group."""
         return language in self.languages
+
+    def __eq__(self, other):
+        if not isinstance(other, LanguageGroup):
+            return False
+        return self.languages == other.languages
+
+    def __hash__(self):
+        return hash(self.languages)
