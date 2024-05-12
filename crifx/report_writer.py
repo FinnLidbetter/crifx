@@ -320,14 +320,48 @@ class ReportWriter:
                         f"{self._oxford_or(groups_not_covered_names)}."
                     )
 
+    def _add_tle_needs(self, enum_env):
+        """Add a text line for TLE submission needs for each problem."""
+        requirements = self.crifx_config.review_requirements
+        for problem in self.problem_set.problems:
+            if len(problem.tle_submissions) < requirements.submissions_tle:
+                tle_needed = requirements.submissions_tle - len(problem.tle_submissions)
+                if requirements.submissions_tle == 1:
+                    enum_env.add_item(
+                        f"{problem.name} needs at least one TLE submission."
+                    )
+                elif tle_needed == 1:
+                    enum_env.add_item(
+                        f"{problem.name} needs at least one more TLE submission."
+                    )
+                else:
+                    enum_env.add_item(
+                        f"{problem.name} needs at least {tle_needed} more TLE "
+                        f"submissions."
+                    )
+
+    def _add_wa_needs(self, enum_env):
+        """Add a text line for WA submission needs for each problem."""
+        requirements = self.crifx_config.review_requirements
+        for problem in self.problem_set.problems:
+            if len(problem.wa_submissions) < requirements.submissions_wa:
+                wa_needed = requirements.submissions_wa - len(problem.wa_submissions)
+                if requirements.submissions_wa == 1:
+                    enum_env.add_item(
+                        f"{problem.name} needs at least one WA submission."
+                    )
+                elif wa_needed == 1:
+                    enum_env.add_item(
+                        f"{problem.name} needs at least one more WA submission."
+                    )
+                else:
+                    enum_env.add_item(
+                        f"{problem.name} needs at least {wa_needed} more WA "
+                        f"submissions."
+                    )
+
     def _write_how_can_i_help(self):
         """Write the 'How can I help?' section."""
-        # First priority: independent solves.
-        # Second priority: language groups.
-        # Third priority: TLE submissions.
-        # Fourth priority: WA submissions.
-        # Fifth priority: Review problem statements.
-        # Sixth priority: Review test data.
         with self.doc.create(Section("How can I help?")):
             self.doc.append(
                 "TODO: replace these with more specific suggestions based on "
@@ -339,8 +373,6 @@ class ReportWriter:
                 self._add_tle_needs(enum_env)
                 self._add_wa_needs(enum_env)
                 enum_env.add_item("Add test data")
-                enum_env.add_item("Add WA submissions")
-                enum_env.add_item("Add TLE submissions")
                 enum_env.add_item("Add input validators")
                 enum_env.add_item("Review problem statements")
                 enum_env.add_item("Review test data")
