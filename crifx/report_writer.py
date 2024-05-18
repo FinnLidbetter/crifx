@@ -91,8 +91,8 @@ class ReportWriter:
         self._write_summary_table()
         self._write_manual_reviews_table()
         self._write_how_can_i_help()
-        for problem in self.problem_set.problems:
-            self._write_problem_details(problem)
+        # for problem in self.problem_set.problems:
+        #     self._write_problem_details(problem)
 
     def _write_summary_table(self):
         """Write the summary table for the document."""
@@ -363,10 +363,6 @@ class ReportWriter:
     def _write_how_can_i_help(self):
         """Write the 'How can I help?' section."""
         with self.doc.create(Section("How can I help?")):
-            self.doc.append(
-                "TODO: replace these with more specific suggestions based on "
-                "what is present and what is still required."
-            )
             with self.doc.create(Enumerate()) as enum_env:
                 self._add_independent_ac_needs(enum_env)
                 self._add_language_group_ac_needs(enum_env)

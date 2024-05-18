@@ -55,7 +55,9 @@ def main():
     crifx_dir_path = make_crifx_dir(problemset_root_path)
     config = parse_config(problemset_root_path)
     git_manager = GitManager(problemset_root_path)
-    problemset_parser = ProblemSetParser(problemset_root_path, git_manager)
+    problemset_parser = ProblemSetParser(
+        problemset_root_path, git_manager, config.alias_groups
+    )
     problemset = problemset_parser.parse_problemset()
     writer = ReportWriter(problemset, config, git_manager)
     writer.build_report(crifx_dir_path)

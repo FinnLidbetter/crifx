@@ -39,6 +39,8 @@ class ProgrammingLanguage(Enum):
     @staticmethod
     def from_filename(filename: str) -> Union["ProgrammingLanguage", None]:
         """Guess the programming language from a file name."""
+        if "." not in filename:
+            return None
         extension = filename[filename.rindex(".") + 1 :]
         for programming_language_str in ProgrammingLanguage:
             programming_language = ProgrammingLanguage(programming_language_str)

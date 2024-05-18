@@ -13,11 +13,11 @@ class Judge:
         name_set.add(primary_name)
         if self.git_name is not None:
             name_set.add(self.git_name)
-        self.aliases = list(name_set)
+        self.aliases = [name.lower() for name in name_set]
 
-    def has_alias(self, name):
+    def has_alias(self, name: str):
         """Determine if the provided name corresponds to this judge."""
-        return name in self.aliases
+        return name.lower() in self.aliases
 
     def is_same(self, other_judge):
         """Determine if two Judge objects correspond to the same person."""

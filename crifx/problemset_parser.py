@@ -5,6 +5,7 @@ import os
 import tomllib
 from typing import Any
 
+from crifx.config_parser import AliasGroup
 from crifx.contest_objects import (
     UNKNOWN_JUDGE,
     Judge,
@@ -16,7 +17,7 @@ from crifx.contest_objects import (
     Submission,
 )
 from crifx.dir_layout_parsing import get_problem_root_dirs, is_contest_problems_root
-from crifx.git_manager import GitManager
+from crifx.git_manager import GitManager, GitUser
 from crifx.report_objects import (
     DEFAULT_REVIEW_STATUS,
     DEFAULT_REVIEW_STATUS_TOML,
@@ -30,7 +31,12 @@ PROBLEM_REVIEW_STATUS_FILENAME = "crifx-problem-status.toml"
 class ProblemSetParser:
     """Controller for parsing a ProblemSet object."""
 
-    def __init__(self, problemset_root_path: str, git_manager: GitManager):
+    def __init__(
+        self,
+        problemset_root_path: str,
+        git_manager: GitManager,
+        alias_groups: list[AliasGroup],
+    ):
         if not is_contest_problems_root(problemset_root_path):
             raise ValueError(
                 f"Path '{problemset_root_path}' is not a problemset root path."
@@ -38,11 +44,11 @@ class ProblemSetParser:
         self.problemset_root_path = problemset_root_path
         self.git_manager = git_manager
         self.judges_by_name: dict[str, Judge] = {}
-        self._set_judges_by_name()
+        self._set_judges_by_name(alias_groups)
 
-    def _set_judges_by_name(self):
+    def _set_judges_by_name(self, alias_groups: list[AliasGroup]):
         git_users = self.git_manager.get_committers_and_authors()
-        git_users_by_name = {}
+        git_users_by_name: dict[str, GitUser] = {}
         for user in git_users:
             if user.name in git_users:
                 logging.warning(
@@ -53,10 +59,30 @@ class ProblemSetParser:
                     user,
                 )
             git_users_by_name[user.name] = user
+        gitless = []
+        aliases_by_git_name = {}
+        for alias_group in alias_groups:
+            if alias_group.git_name is not None:
+                aliases_by_git_name[alias_group.git_name] = alias_group.aliases
+            else:
+                gitless.append(alias_group)
         self.judges_by_name = {
-            git_user.name: Judge(git_user.name, git_user)
+            git_user.name: Judge(
+                git_user.name, git_user, *aliases_by_git_name.get(git_user.name, [])
+            )
             for git_user in git_users_by_name.values()
         }
+        for alias_group in gitless:
+            if alias_group.identifier in git_users_by_name:
+                logging.warning(
+                    "Add a 'git_name' for judge '%s' in the crifx configuration "
+                    "file to use their aliases.",
+                    alias_group.identifier,
+                )
+            else:
+                self.judges_by_name[alias_group.identifier] = Judge(
+                    alias_group.identifier, None, *alias_group.aliases
+                )
 
     def parse_problemset(self) -> ProblemSet:
         """Parse a ProblemSet."""
@@ -183,8 +209,15 @@ class ProblemSetParser:
             if language is None:
                 continue
             submission_path = os.path.join(submissions_dir, filename)
-            git_user = self.git_manager.guess_file_author(submission_path)
-            judge = self.judges_by_name.get(getattr(git_user, "name")) or UNKNOWN_JUDGE
+            git_user_guess = self.git_manager.guess_file_author(submission_path)
+            filename_guess = self.guess_author_by_filename(filename)
+            if filename_guess is None:
+                judge = (
+                    self.judges_by_name.get(getattr(git_user_guess, "name"))
+                    or UNKNOWN_JUDGE
+                )
+            else:
+                judge = filename_guess
             lines_of_code = 0
             file_bytes = 0
             try:
@@ -246,6 +279,19 @@ class ProblemSetParser:
             validators_reviewed_by,
             data_reviewed_by,
         )
+
+    def guess_author_by_filename(self, filename) -> Judge | None:
+        """Guess the author of a file based on the filename and configured aliases."""
+        if "." in filename:
+            filename_without_extension = filename[: filename.rindex(".")]
+        else:
+            filename_without_extension = filename
+        underscore_split_filename = filename_without_extension.split("_")
+        for part in underscore_split_filename:
+            for judge in self.judges_by_name.values():
+                if judge.has_alias(part):
+                    return judge
+        return None
 
 
 def _read_reviewers(

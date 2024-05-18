@@ -5,6 +5,7 @@ The configuration file is also used for manually tracking the review status
 of the different parts of each problem.
 """
 
+import itertools
 import logging
 import os
 import tomllib
@@ -100,6 +101,24 @@ class LanguageGroupConfig:
         )
 
 
+@dataclass(frozen=True)
+class AliasGroup:
+    """Alias group object for parsing alternate names from a config file."""
+
+    identifier: str
+    git_name: str | None
+    aliases: list[str]
+
+    @staticmethod
+    def from_toml_dict(
+        toml_dict: dict[str, Any], group_identifier: str
+    ) -> "AliasGroup":
+        """Parse an AliasGroup from a toml dictionary."""
+        aliases = toml_dict.get("aliases", [])
+        git_name = toml_dict.get("git_name")
+        return AliasGroup(group_identifier, git_name, aliases)
+
+
 class Config:
     """Configuration for crifx requirements and review status."""
 
@@ -109,6 +128,7 @@ class Config:
             toml_dict.get("review_requirements", {}),
         )
         self.language_group_configs = []
+        self.alias_groups = []
         language_groups = toml_dict.get("language_groups", {})
         for group_identifier, language_group_dict in language_groups.items():
             language_group_config = LanguageGroupConfig.from_toml_dict(
@@ -118,6 +138,25 @@ class Config:
                 # No languages parsed from the language group.
                 continue
             self.language_group_configs.append(language_group_config)
+        alias_groups = toml_dict.get("aliases", {})
+        for identifier, alias_group_dict in alias_groups.items():
+            alias_group = AliasGroup.from_toml_dict(alias_group_dict, identifier)
+            self.alias_groups.append(alias_group)
+        for alias_group_1, alias_group_2 in itertools.product(
+            self.alias_groups, self.alias_groups
+        ):
+            if alias_group_1 == alias_group_2:
+                continue
+            shared_aliases = list(
+                set(alias_group_1.aliases) & set(alias_group_2.aliases)
+            )
+            if shared_aliases:
+                logging.warning(
+                    "Judges '%s' and '%s' share the following aliases: %s. Remove shared "
+                    "aliases from the crifx configuration file.",
+                    alias_group_1.identifier,
+                    alias_group_2.identifier,
+                )
 
 
 def parse_config(problemset_root_path: str) -> Config:
