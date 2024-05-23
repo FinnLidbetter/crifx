@@ -22,8 +22,6 @@ def test_scenario_1(scenarios_path):
     desc_test_case = a_desc_test_cases[0]
     assert desc_test_case.name == "2"
     assert desc_test_case.dir_path.endswith("data/secret")
-    assert desc_test_case.input_lines == ["Secret case\n", "with more than one line"]
-    assert desc_test_case.answer_lines == ["Hello world!"]
     assert desc_test_case.description_lines == [
         "Secret test case\n",
         "\n",

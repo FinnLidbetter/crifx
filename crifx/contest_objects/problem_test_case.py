@@ -11,8 +11,6 @@ class ProblemTestCase:
     name: str
     is_sample: bool
     dir_path: str
-    input_lines: list[str]
-    answer_lines: list[str]
     description_lines: list[str]
     image_extension: str | None
 

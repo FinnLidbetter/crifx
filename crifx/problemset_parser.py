@@ -172,8 +172,6 @@ class ProblemSetParser:
                 name,
                 is_sample,
                 test_case_dir,
-                input_lines,
-                ans_lines,
                 desc_lines,
                 image_extension,
             )

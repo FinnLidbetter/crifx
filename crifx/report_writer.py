@@ -91,8 +91,8 @@ class ReportWriter:
         self._write_summary_table()
         self._write_manual_reviews_table()
         self._write_how_can_i_help()
-        # for problem in self.problem_set.problems:
-        #     self._write_problem_details(problem)
+        for problem in self.problem_set.problems:
+            self._write_problem_details(problem)
 
     def _write_summary_table(self):
         """Write the summary table for the document."""
@@ -409,30 +409,6 @@ class ReportWriter:
                                     options=LISTING_OPTIONS,
                                 )
                             )
-                        else:
-                            if all(
-                                len(line) <= INPUT_FILE_WIDTH_MAX
-                                for line in test_case.input_lines[:INPUT_FILE_LINES_MAX]
-                            ):
-                                truncated_input = "".join(test_case.input_lines[:10])
-                                with self.doc.create(
-                                    LstListing(options=LISTING_OPTIONS)
-                                ):
-                                    self.doc.append(
-                                        truncated_input,
-                                    )
-                                lines_remaining = (
-                                    len(test_case.input_lines) - INPUT_FILE_LINES_MAX
-                                )
-                                if lines_remaining > 0:
-                                    self.doc.append(
-                                        f"The remaining {lines_remaining} lines have not been rendered "
-                                        f"for brevity."
-                                    )
-                            else:
-                                self.doc.append(
-                                    "\nInput file lines are too long to render here."
-                                )
 
     def write_tex(self, dirpath: str):
         """Write the tex output."""
