@@ -10,10 +10,10 @@ an icpc-style competitive programming contest.
 Install crifx with `pip install crifx`. (Does not work yet.)
 
 ## Using crifx
-In the root directory for a problemset, run `crifx .` or run 
-`crifx /path/to/problemset/root` (not yet implemented). If there is no `crifx.toml` 
-configuration file in that directory, then a report will be created using default
-configuration values.
+In the root directory for a problemset, run `crifx` from within a problemset nested
+directory, or run `crifx /path/to/problemset/root` (not yet implemented). 
+If there is no `crifx.toml` configuration file in the problemset root directory, 
+then a report will be created using default configuration values.
 
 Crifx can be configured by adding a `crifx.toml` file to the root of the problemset 
 directory. The configuration can be used to define requirements on things like
