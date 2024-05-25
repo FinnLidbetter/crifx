@@ -14,7 +14,7 @@ dependencies = [ "pylatex>=1.4.2", "pygit2>=1.14.1" ]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Framework :: Tox",
-    "Intended Audience :: Information Technology",
+    "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
@@ -40,7 +40,7 @@ line-length = 88
 
 [tool.ruff.lint]
 select = [
-    "D"
+    "D",
 ]
 ignore = ["D105", "D107", "D203", "D212", "D213"]
 
