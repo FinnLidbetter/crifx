@@ -7,38 +7,62 @@
 \usepackage{geometry}%
 \geometry{tmargin=2cm,lmargin=2cm,rmargin=2cm,bmargin=2cm}%
 \usepackage[table]{xcolor}%
-\usepackage{listings}%
 %
 \usepackage{datetime2}%
 \usepackage{listings}%
 \title{CRIFX Contest Preparation Status Report}%
-\date{Compiled \today~at \DTMcurrenttime\DTMcurrentzone~for commit 137dfe48}%
+\date{Compiled \today~at \DTMcurrenttime\DTMcurrentzone~for commit fc2980d2}%
 %
 \begin{document}%
 \normalsize%
 \maketitle%
-\begin{tabular}{|l|c|c|c|c|c|}%
+\section{Submissions summary}%
+\label{sec:Submissionssummary}%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|}%
 \hline%
 \rowcolor{cyan}%
-Problem&Independent Solves&AC&WA&TLE&Test Cases\\%
+&\multicolumn{6}{c}{{\tiny Solutions}}&\multicolumn{2}{|c|}{{\tiny Non-solutions}}&\\%
 \hline%
-addtwonumbers&1&1&0&0&0\\%
+\rowcolor{cyan}%
+{\tiny Problem}&{\tiny Independent}&{\tiny Groups}&{\tiny c/c++}&{\tiny java/kotlin}&{\tiny python}&{\tiny Sum}&{\tiny WA}&{\tiny TLE}&{\tiny Test Files}\\%
 \hline%
-helloworld&1&2&1&0&5\\%
+addtwonumbers&\cellcolor{red}1/3&\cellcolor{red}1/2&0&0&1&1&0&0&0\\%
 \hline%
-\end{tabular}%
+helloworld&\cellcolor{red}1/3&\cellcolor{green}2/2&0&1&1&2&1&0&5\\%
+\hline%
+\end{tabular}
+
+%
+\section{Manual review tracking}%
+\label{sec:Manualreviewtracking}%
+\begin{tabular}{|l|c|c|c|}%
+\hline%
+\rowcolor{cyan}%
+{\tiny Problem}&{\tiny Statement}&{\tiny Validator(s)}&{\tiny Data}\\%
+addtwonumbers&\cellcolor{red}0/3&\cellcolor{red}0/2&\cellcolor{red}0/2\\%
+\hline%
+helloworld&\cellcolor{green}3/3&\cellcolor{red}1/2&\cellcolor{green}2/2\\%
+\hline%
+\end{tabular}
+
+%
 \section{How can I help?}%
 \label{sec:HowcanIhelp?}%
-TODO: replace these with more specific suggestions based on what is present and what is still required.%
 \begin{enumerate}%
 \item%
-Write AC submissions%
+addtwonumbers needs at least 2 more AC submissions from people other than Finn Lidbetter.%
+\item%
+helloworld needs at least 2 more AC submissions from people other than Finn Lidbetter.%
+\item%
+addtwonumbers needs at least one more AC submission from any of the following language groups: c/c++ or java/kotlin.%
+\item%
+addtwonumbers needs at least one TLE submission.%
+\item%
+helloworld needs at least one TLE submission.%
+\item%
+addtwonumbers needs at least one WA submission.%
 \item%
 Add test data%
-\item%
-Add WA submissions%
-\item%
-Add TLE submissions%
 \item%
 Add input validators%
 \item%
@@ -60,6 +84,7 @@ Including problemtools verifyproblem output is disabled for this problem. It can
 %
 \subsection{Test Cases}%
 \label{subsec:TestCases}%
+Test case descriptions are rendered below if they exist. Otherwise, the first 10 lines of input are rendered if they each have at most 90 characters.%
 
 %
 \newpage%
@@ -72,13 +97,10 @@ null
 %
 \subsection{Test Cases}%
 \label{subsec:TestCases}%
+Test case descriptions are rendered below if they exist. Otherwise, the first 10 lines of input are rendered if they each have at most 90 characters.%
 \begin{itemize}%
 \item%
 sample{-}1%
-\begin{lstlisting}[basicstyle=\footnotesize,backgroundcolor=\color{lightgray},framexleftmargin=1em,framexrightmargin=1em]
-world
-
-\end{lstlisting}%
 \item%
 001{-}finn%
 \lstinputlisting[basicstyle=\footnotesize,backgroundcolor=\color{lightgray},framexleftmargin=1em,framexrightmargin=1em]{/Users/finn/git/crifx/examples/example_problemset/helloworld/data/secret/001-finn.desc}%
@@ -87,16 +109,8 @@ world
 \lstinputlisting[basicstyle=\footnotesize,backgroundcolor=\color{lightgray},framexleftmargin=1em,framexrightmargin=1em]{/Users/finn/git/crifx/examples/example_problemset/helloworld/data/secret/005-mrthompson.desc}%
 \item%
 010{-}shortest%
-\begin{lstlisting}[basicstyle=\footnotesize,backgroundcolor=\color{lightgray},framexleftmargin=1em,framexrightmargin=1em]
-a
-
-\end{lstlisting}%
 \item%
 015{-}longest%
-\begin{lstlisting}[basicstyle=\footnotesize,backgroundcolor=\color{lightgray},framexleftmargin=1em,framexrightmargin=1em]
-abcdefghijklmnopqrst
-
-\end{lstlisting}%
 \end{itemize}
 
 %

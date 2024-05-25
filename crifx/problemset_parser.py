@@ -144,13 +144,9 @@ class ProblemSetParser:
                 continue
             name = filename
             is_sample = test_case_dir.startswith("sample")
-            input_lines = []
-            ans_lines: list[str] = []
             desc_lines = []
             image_extension = None
             try:
-                input_file_path = os.path.join(test_case_dir, f"{filename}.in")
-                ans_file_path = os.path.join(test_case_dir, f"{filename}.ans")
                 desc_file_path = os.path.join(test_case_dir, f"{filename}.desc")
                 image_extension = None
                 for extension in TEST_CASE_IMAGE_EXTENSIONS:
@@ -159,10 +155,6 @@ class ProblemSetParser:
                     ):
                         image_extension = extension
                         break
-                with open(input_file_path) as input_file:
-                    input_lines = list(input_file.readlines())
-                with open(ans_file_path) as answer_file:
-                    ans_lines = list(answer_file.readlines())
                 if os.path.exists(desc_file_path):
                     with open(desc_file_path) as desc_file:
                         desc_lines = list(desc_file.readlines())
