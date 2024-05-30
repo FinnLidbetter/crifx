@@ -381,6 +381,8 @@ class ReportWriter:
         with self.doc.create(Section(problem.name)):
             with self.doc.create(Subsection("Submissions")):
                 with self.doc.create(Subsection("Accepted")):
+                    if not problem.wa_submissions:
+                        self.doc.append("No accepted submissions.")
                     with self.doc.create(Itemize()) as itemize:
                         for submission in problem.ac_submissions:
                             itemize.add_item(
@@ -388,6 +390,8 @@ class ReportWriter:
                                 f"{submission.lines_of_code} lines of code."
                             )
                 with self.doc.create(Subsection("Wrong Answer")):
+                    if not problem.wa_submissions:
+                        self.doc.append("No wrong answer submissions.")
                     with self.doc.create(Itemize()) as itemize:
                         for submission in problem.wa_submissions:
                             itemize.add_item(
@@ -395,6 +399,8 @@ class ReportWriter:
                                 f"{submission.lines_of_code} lines of code."
                             )
                 with self.doc.create(Subsection("Time Limit Exceeded")):
+                    if not problem.tle_submissions:
+                        self.doc.append("No time limit exceeded submissions.")
                     with self.doc.create(Itemize()) as itemize:
                         for submission in problem.tle_submissions:
                             itemize.add_item(

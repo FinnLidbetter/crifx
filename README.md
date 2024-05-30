@@ -28,7 +28,7 @@ people.
 
 ### How crifx decides the author of a submission
 In order of precedence, crifx determines the author of a file by:
-1. The presence of a crifx!(author="name") string in the text of a submission file. (Not yet implemented.)
+1. The presence of a crifx!(author="name") string in the text of a submission file.
 2. The presence of an underscore separated name string that matches an alias in the
    `crifx.toml` configuration file.
 3. The git user associated with the largest number of lines in the git blame. Roughly speaking this will be
