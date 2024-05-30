@@ -379,6 +379,28 @@ class ReportWriter:
         assert self.doc is not None
         self.doc.append(Command(r"newpage"))
         with self.doc.create(Section(problem.name)):
+            with self.doc.create(Subsection("Submissions")):
+                with self.doc.create(Subsection("Accepted")):
+                    with self.doc.create(Itemize()) as itemize:
+                        for submission in problem.ac_submissions:
+                            itemize.add_item(
+                                f"{submission.filename} by {submission.author}. "
+                                f"{submission.lines_of_code} lines of code."
+                            )
+                with self.doc.create(Subsection("Wrong Answer")):
+                    with self.doc.create(Itemize()) as itemize:
+                        for submission in problem.wa_submissions:
+                            itemize.add_item(
+                                f"{submission.filename} by {submission.author}. "
+                                f"{submission.lines_of_code} lines of code."
+                            )
+                with self.doc.create(Subsection("Time Limit Exceeded")):
+                    with self.doc.create(Itemize()) as itemize:
+                        for submission in problem.tle_submissions:
+                            itemize.add_item(
+                                f"{submission.filename} by {submission.author}. "
+                                f"{submission.lines_of_code} lines of code."
+                            )
             with self.doc.create(Subsection("Problemtools verifyproblem output")):
                 if problem.review_status.run_problemtools:
                     self.doc.append("null")
@@ -390,10 +412,7 @@ class ReportWriter:
                     )
             with self.doc.create(Subsection("Test Cases")):
                 self.doc.append(
-                    "Test case descriptions are rendered below if they exist. "
-                    f"Otherwise, the first {INPUT_FILE_LINES_MAX} lines of input "
-                    f"are rendered if they each have at most {INPUT_FILE_WIDTH_MAX} "
-                    "characters."
+                    "Test case descriptions are rendered below if .desc files exist."
                 )
                 with self.doc.create(Itemize()) as itemize:
                     for test_case in problem.test_cases:

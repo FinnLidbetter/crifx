@@ -74,6 +74,17 @@ class ProblemSetParser:
             )
             for git_user in git_users_by_name.values()
         }
+        for alias_group in alias_groups:
+            if (
+                alias_group.git_name is not None
+                and alias_group.git_name not in self.judges_by_name
+            ):
+                # The user has a git name but no commits in the repository yet.
+                self.judges_by_name[alias_group.git_name] = Judge(
+                    alias_group.identifier,
+                    GitUser(alias_group.git_name, "unknown email", b"", b""),
+                    *alias_group.aliases,
+                )
         for alias_group in gitless:
             if alias_group.identifier in git_users_by_name:
                 logging.warning(
@@ -85,6 +96,7 @@ class ProblemSetParser:
                 self.judges_by_name[alias_group.identifier] = Judge(
                     alias_group.identifier, None, *alias_group.aliases
                 )
+        logging.debug("Identified judges: %s", str(self.judges_by_name))
 
     def parse_problemset(self) -> ProblemSet:
         """Parse a ProblemSet."""
@@ -210,14 +222,15 @@ class ProblemSetParser:
                     for line_number, line in enumerate(submission_lines):
                         author_match = re.search(CRIFX_AUTHOR_PATTERN, line)
                         if author_match is not None:
+                            author_name_override = author_match.group(1)
                             logging.debug(
-                                "Found author override for file %s on line %d",
+                                "Found author override for file %s on line %d. Override name is '%s'",
                                 submission_path,
                                 line_number + 1,
+                                author_name_override,
                             )
-                            author_name_override = author_match.group(1)
                             break
-                    lines_of_code = len(submission_file.readlines())
+                    lines_of_code = len(submission_lines)
                 file_bytes = os.stat(submission_path).st_size
             except (FileExistsError, FileNotFoundError, PermissionError):
                 logging.warning(

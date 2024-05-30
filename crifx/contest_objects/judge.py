@@ -26,5 +26,8 @@ class Judge:
             or self.primary_name == other_judge.primary_name
         )
 
+    def __str__(self):
+        return f"{self.primary_name}"
+
 
 UNKNOWN_JUDGE = Judge("UNKNOWN", None)
