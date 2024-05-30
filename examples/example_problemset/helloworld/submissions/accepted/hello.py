@@ -4,7 +4,7 @@
 
 # Use a crifx command to override the author for this submission instead
 # of relying on git blame information.
-# crifx!(author="Homer Simpson")
+# crifx!(author=Homer Simpson)
 
 from sys import stdin
 

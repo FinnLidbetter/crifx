@@ -15,6 +15,7 @@ CRIFX_ERROR_EXIT_CODE = 1
 
 
 def _dir_path_argparse_type(path):
+    """Check that the provided path is a directory."""
     if os.path.isdir(path):
         return path
     else:

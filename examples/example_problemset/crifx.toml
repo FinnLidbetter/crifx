@@ -22,21 +22,36 @@ validator_reviewers = 2
 # There must be at least 2 judges who have reviewed the test data.
 data_reviewers = 2
 
-# Section for defining language groups.
-[language_groups]
-# Non alphanumeric characters can be used in the language group name crifx
-# the language group name is written in double quotes "".
-[language_groups."c/c++"]
+# Define judge names in `[[judge]]` tables.
+[[judge]]
+# Primary name is required.
+primary_name = "Jane Doe"
+# git_name is not required.
+# git_name = "janedoe"
+# Aliases is a list of zero or more alternative names.
+aliases = ["jd", "jane"]
+
+[[judge]]
+primary_name = "Homer Simpson"
+git_name = "homers123"
+aliases = []
+
+# Tables for defining language groups.
+[[language_group]]
+# Non alphanumeric characters can be used in the language group name.
+name = "c/c++"
 # The names of the languages in the group. Language names are cast to
 # lowercase before comparison to language names known to crifx.
 languages = ["C", "C++"]
 # The number of AC submissions required for this group.
 required_ac_count = 0
 
-[language_groups."java/kotlin"]
+[[language_group]]
+name = "java/kotlin"
 languages = ["Java", "Kotlin"]
 required_ac_count = 0
 
-[language_groups.python]
+[[language_group]]
+name = "python"
 languages = ["Python"]
 required_ac_count = 0

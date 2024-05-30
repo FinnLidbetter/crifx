@@ -80,10 +80,13 @@ class LanguageGroupConfig:
     required_ac_count: int = 0
 
     @staticmethod
-    def from_toml_dict(
-        toml_dict: dict[str, Any], group_identifier: str
-    ) -> "LanguageGroupConfig":
+    def from_toml_dict(toml_dict: dict[str, Any]) -> "LanguageGroupConfig":
         """Initialize a LanguageGroupConfig from a toml dict."""
+        group_identifier = toml_dict.get("name")
+        if group_identifier is None:
+            raise ValueError(
+                "Language group in the `crifx.toml` file is missing a 'name'"
+            )
         language_names = toml_dict.get("languages", [])
         languages = []
         for language_name in language_names:
@@ -110,13 +113,16 @@ class AliasGroup:
     aliases: list[str]
 
     @staticmethod
-    def from_toml_dict(
-        toml_dict: dict[str, Any], group_identifier: str
-    ) -> "AliasGroup":
+    def from_toml_dict(toml_dict: dict[str, Any]) -> "AliasGroup":
         """Parse an AliasGroup from a toml dictionary."""
-        aliases = toml_dict.get("aliases", [])
+        primary_name = toml_dict.get("primary_name")
+        if primary_name is None:
+            raise ValueError(
+                "The `crifx.toml` file is missing a 'primary_name' for one or more 'judge' tables."
+            )
         git_name = toml_dict.get("git_name")
-        return AliasGroup(group_identifier, git_name, aliases)
+        aliases = toml_dict.get("aliases", [])
+        return AliasGroup(primary_name, git_name, aliases)
 
 
 class Config:
@@ -129,18 +135,18 @@ class Config:
         )
         self.language_group_configs = []
         self.alias_groups = []
-        language_groups = toml_dict.get("language_groups", {})
-        for group_identifier, language_group_dict in language_groups.items():
+        language_groups = toml_dict.get("language_group", [])
+        for language_group_dict in language_groups:
             language_group_config = LanguageGroupConfig.from_toml_dict(
-                language_group_dict, group_identifier
+                language_group_dict,
             )
             if not language_group_config.language_group.languages:
                 # No languages parsed from the language group.
                 continue
             self.language_group_configs.append(language_group_config)
-        alias_groups = toml_dict.get("aliases", {})
-        for identifier, alias_group_dict in alias_groups.items():
-            alias_group = AliasGroup.from_toml_dict(alias_group_dict, identifier)
+        alias_groups = toml_dict.get("judge", [])
+        for alias_group_dict in alias_groups:
+            alias_group = AliasGroup.from_toml_dict(alias_group_dict)
             self.alias_groups.append(alias_group)
         for alias_group_1, alias_group_2 in itertools.product(
             self.alias_groups, self.alias_groups

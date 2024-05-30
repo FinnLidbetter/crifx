@@ -2,6 +2,7 @@
 
 import logging
 import os
+import re
 import tomllib
 from typing import Any
 
@@ -26,6 +27,7 @@ from crifx.report_objects import (
 
 TEST_CASE_IMAGE_EXTENSIONS = ["png", "jpg", "jpeg"]
 PROBLEM_REVIEW_STATUS_FILENAME = "crifx-problem-status.toml"
+CRIFX_AUTHOR_PATTERN = "crifx!\(author=([a-zA-Z0-9_ ]+)\)"
 
 
 class ProblemSetParser:
@@ -199,25 +201,44 @@ class ProblemSetParser:
             if language is None:
                 continue
             submission_path = os.path.join(submissions_dir, filename)
-            git_user_guess = self.git_manager.guess_file_author(submission_path)
-            filename_guess = self.guess_author_by_filename(filename)
-            if filename_guess is None:
-                judge = (
-                    self.judges_by_name.get(getattr(git_user_guess, "name"))
-                    or UNKNOWN_JUDGE
-                )
-            else:
-                judge = filename_guess
             lines_of_code = 0
             file_bytes = 0
+            author_name_override = None
             try:
                 with open(submission_path, "r") as submission_file:
+                    submission_lines = submission_file.readlines()
+                    for line_number, line in enumerate(submission_lines):
+                        author_match = re.search(CRIFX_AUTHOR_PATTERN, line)
+                        if author_match is not None:
+                            logging.debug(
+                                "Found author override for file %s on line %d",
+                                submission_path,
+                                line_number + 1,
+                            )
+                            author_name_override = author_match.group(1)
+                            break
                     lines_of_code = len(submission_file.readlines())
                 file_bytes = os.stat(submission_path).st_size
             except (FileExistsError, FileNotFoundError, PermissionError):
                 logging.warning(
                     "Could not determine size of submission at path '%s'",
                     submission_path,
+                )
+            git_user_guess = self.git_manager.guess_file_author(submission_path)
+            filename_guess = self.guess_author_by_filename(filename)
+            if author_name_override is not None:
+                judge = UNKNOWN_JUDGE
+                for candidate_judge in self.judges_by_name.values():
+                    if candidate_judge.has_alias(author_name_override):
+                        judge = candidate_judge
+                        break
+            elif filename_guess is not None:
+                judge = filename_guess
+
+            else:
+                judge = (
+                    self.judges_by_name.get(getattr(git_user_guess, "name"))
+                    or UNKNOWN_JUDGE
                 )
             submission = Submission(
                 judge,
