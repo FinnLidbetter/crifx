@@ -1,9 +1,6 @@
 # GitHub Issue id number associated with this problem.
 github_issue_id = 1
 
-# Whether or not to run problemtools verifyproblem.
-run_problemtools = true
-
 [review_status]
 # List of names of judges who have reviewed the problem statement.
 statement_reviewed_by = [

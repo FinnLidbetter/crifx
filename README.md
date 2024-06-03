@@ -24,7 +24,7 @@ names of people involved in contest preparation such that filenames and special
 strings in judge submissions can be used to associate submissions with those 
 people.
 
-## Counting indepedent submissions
+## Counting independent submissions
 
 ### How crifx decides the author of a submission
 In order of precedence, crifx determines the author of a file by:
@@ -40,3 +40,78 @@ a git username. More details to come, including an example.
 If you encounter a scenario where crifx is incorrectly attributing a submission to the wrong person
 and it cannot easily be fixed by adding a user and alias to the `crifx.toml` file.
 Crifx does not yet support disambiguating git users with the same git name.
+
+## Configuration
+
+### Top-level
+The top-level configuration of `crifx` is defined in a TOML text file named 
+`crifx.toml` placed in the directory containing the directories for each problem.
+
+
+- `github_repo_url`. Optional. String. Default: `null`. The GitHub repository url for 
+the problem set. This should be the root url for the repository and not the url to 
+some directory in the repository tree.
+
+#### `[review_requirements]`
+
+- `independent_ac`. Optional. Integer. Default: `3`.
+- `language_groups`. Optional. Integer. Default: `2`.
+- `submissions_wa`. Optional. Integer. Default: `1`.
+- `submissions_tle`. Optional. Integer. Default: `1`.
+- `statement_reviewers`. Optional. Integer. Default: `3`.
+- `validator_reviewers`. Optional. Integer. Default: `2`.
+- `data_reviewers`. Optional. Integer. Default: `2`.
+
+#### `[[judge]]`
+The `judge` array of tables is used to associate judge names and aliases. The
+judge name can also optionally be associated with a git name.
+- `primary_name`. Required. String. A name to identify the judge with. This name
+will be used in the `crifx` report when listing who wrote each submission and who 
+is ineligible to provide further contributions for a problem. 
+- `git_name`. Optional. String. This is the git name for the judge if they 
+have one. Note that this is _not_ the GitHub username. From the command line, you 
+can see your git name with the command `git config user.name`. By 
+specifying a `git_name`, submissions from a judge that are uploaded or edited by 
+someone else can be associated with submissions that the judge themself uploads. 
+For the submission uploaded by someone else, the submission will need to be 
+identified by file name or a `crifx!(author=name)` string in the submission file.
+- `aliases`. Optional. Array of Strings. List of aliases that can be used to identify 
+the judge. Submission file names are split into parts by underscores. If any part 
+matches an alias of a judge, then the submission is assumed to belong to the judge 
+with the alias and associated primary name/git name. Aliases can also be used in
+`crifx!(author=name)` strings inside submission files to identify a judge.
+
+#### `[[language_group]]`
+- `name`. Required. String. A name to use for the language group. E.g., `"C/C++"`
+- `languages`. Required. Array of Strings. A list of languages to include in the
+group. The languages must be known to `crifx`.
+- `required_ac_count`. Optional. Integer. Default: `0`. The number of Accepted 
+submissions that are required for this language group. E.g., a value of `2` means 
+that each problem must have at least `2` accepted submissions from languages in 
+this language group.
+
+### Per problem configuration
+For each problem, a TOML text file placed in the root directory for the problem
+(i.e., at the same level as the `problem.yaml` file and the `submissions` directory), 
+called `crifx-problem-status.toml`. This file can be used to track who has reviewed
+different parts of a problem. It can also be used to define some per-problem configuration.
+
+- `github_issue_id`. Optional. Integer. Default: `null`. The GitHub Issue id number 
+for a GitHub Issue that may have been created to discuss the problem. This is used 
+to generate links to the GitHub Issue url from within the `crifx` report.
+
+#### `[review_status]`
+- `statement_reviewed_by`. Optional. Array of Strings. A list of judge aliases for 
+judges that have reviewed the problem statement and are happy with the state of the
+problem statement for use in a contest. The judge's name should only be added to this 
+list if they think that the statement is clear and unambiguous.
+- `validators_reviewed_by`. Optional. Array of Strings. A list of judge aliases for
+judges that have reviewed the input (and output) validators. The judge's name should 
+only be added to this list if they have verified that the input validator checks all 
+guarantees made in the problem statement about the input data.
+- `data_reviewed_by`. Optional. Array of Strings. A list of judge aliases for judges 
+that have reviewed the test data (secret and sample). The judge's name should only 
+be added to this list if they have inspected the generated test data and after doing 
+so they cannot think of another test case that should be added to ensure that correct 
+submissions will be judged as correct and incorrect submissions will be judged as 
+incorrect.

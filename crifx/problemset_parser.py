@@ -4,7 +4,7 @@ import logging
 import os
 import re
 import tomllib
-from typing import Any
+from typing import Any, Optional
 
 from crifx.config_parser import AliasGroup
 from crifx.contest_objects import (
@@ -38,6 +38,7 @@ class ProblemSetParser:
         problemset_root_path: str,
         git_manager: GitManager,
         alias_groups: list[AliasGroup],
+        track_review_status: bool,
     ):
         if not is_contest_problems_root(problemset_root_path):
             raise ValueError(
@@ -45,6 +46,7 @@ class ProblemSetParser:
             )
         self.problemset_root_path = problemset_root_path
         self.git_manager = git_manager
+        self.track_review_status = track_review_status
         self.judges_by_name: dict[str, Judge] = {}
         self._set_judges_by_name(alias_groups)
 
@@ -264,8 +266,13 @@ class ProblemSetParser:
             submissions.append(submission)
         return submissions
 
-    def _parse_review_status(self, problem_root_dir: str) -> ReviewStatus:
+    def _parse_review_status(
+        self,
+        problem_root_dir: str,
+    ) -> ReviewStatus:
         """Parse the problem review status."""
+        if not self.track_review_status:
+            return DEFAULT_REVIEW_STATUS
         review_status_path = os.path.join(
             problem_root_dir,
             PROBLEM_REVIEW_STATUS_FILENAME,
@@ -285,7 +292,6 @@ class ProblemSetParser:
         github_issue_id = toml_dict.get("github_issue_id")
         if not isinstance(github_issue_id, int):
             github_issue_id = None
-        run_problemtools = bool(toml_dict.get("run_problemtools", False))
         review_status_dict = toml_dict.get("review_status", {})
         statement_reviewed_by = _read_reviewers(
             review_status_dict, "statement_reviewed_by", review_status_path
@@ -298,7 +304,6 @@ class ProblemSetParser:
         )
         return ReviewStatus(
             github_issue_id,
-            run_problemtools,
             statement_reviewed_by,
             validators_reviewed_by,
             data_reviewed_by,

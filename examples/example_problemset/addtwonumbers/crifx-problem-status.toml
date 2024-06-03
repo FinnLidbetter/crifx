@@ -1,7 +1,4 @@
 
-# This problem is not yet ready for problemtools verifyproblem runs.
-run_problemtools = false
-
 # github_issue_id is not required.
 # github_issue_id =
 

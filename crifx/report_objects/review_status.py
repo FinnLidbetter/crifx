@@ -8,22 +8,17 @@ class ReviewStatus:
     """Per-problem status tracking data."""
 
     github_issue_id: int | None
-    run_problemtools: bool
     statement_reviewed_by: list[str]
     validators_reviewed_by: list[str]
     data_reviewed_by: list[str]
 
 
-DEFAULT_REVIEW_STATUS = ReviewStatus(None, False, [], [], [])
+DEFAULT_REVIEW_STATUS = ReviewStatus(None, [], [], [])
 
 
 DEFAULT_REVIEW_STATUS_TOML = """
 # The GitHub Issue id for the problem, if there is one.
 # github_issue_id = 
-
-# Set `run_problemtools` to "true" when the problem is sufficiently developed
-# to run the problemtools verifyproblem routine.
-run_problemtools = false
 
 [review_status]
 # Add your name in double quotes on a new line in this list if you have read

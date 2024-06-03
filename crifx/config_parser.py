@@ -164,6 +164,15 @@ class Config:
                     alias_group_2.identifier,
                 )
 
+    @property
+    def track_review_status(self) -> bool:
+        """Return True iff manual reviews are required to be tracked in files per problem."""
+        return (
+            self.review_requirements.statement_reviewers > 0
+            or self.review_requirements.data_reviewers > 0
+            or self.review_requirements.validator_reviewers > 0
+        )
+
 
 def parse_config(problemset_root_path: str) -> Config:
     """Parse a configuration file into a Config object."""

@@ -407,15 +407,6 @@ class ReportWriter:
                                 f"{submission.filename} by {submission.author}. "
                                 f"{submission.lines_of_code} lines of code."
                             )
-            with self.doc.create(Subsection("Problemtools verifyproblem output")):
-                if problem.review_status.run_problemtools:
-                    self.doc.append("null")
-                else:
-                    self.doc.append(
-                        "Including problemtools verifyproblem output is disabled "
-                        "for this problem. It can be enabled in the "
-                        "crifx-problem-status.toml file for this problem."
-                    )
             with self.doc.create(Subsection("Test Cases")):
                 self.doc.append(
                     "Test case descriptions are rendered below if .desc files exist."
