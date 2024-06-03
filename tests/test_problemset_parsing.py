@@ -13,7 +13,7 @@ def test_scenario_1(scenarios_path):
     path = os.path.join(scenarios_path, "sample_contest_1")
     git_manager = GitManager(scenarios_path)
     config = parse_config(path)
-    parser = ProblemSetParser(path, git_manager, config.alias_groups)
+    parser = ProblemSetParser(path, git_manager, config.alias_groups, False)
     problemset = parser.parse_problemset()
     problem_a = next(
         problem for problem in problemset.problems if problem.name == "problem_a"
