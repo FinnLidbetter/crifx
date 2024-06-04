@@ -10,8 +10,10 @@
 %
 \usepackage{datetime2}%
 \usepackage{listings}%
+\definecolor{insufficientred}{RGB}{255,100,100}%
+\definecolor{sufficientgreen}{RGB}{0,210,0}%
 \title{CRIFX Contest Preparation Status Report}%
-\date{Compiled \today~at \DTMcurrenttime\DTMcurrentzone~for commit 29f58da3}%
+\date{Compiled \today~at \DTMcurrenttime\DTMcurrentzone~for commit 09095607}%
 %
 \begin{document}%
 \normalsize%
@@ -26,22 +28,9 @@
 \rowcolor{cyan}%
 {\tiny Problem}&{\tiny Independent}&{\tiny Groups}&{\tiny c/c++}&{\tiny java/kotlin}&{\tiny python}&{\tiny Sum}&{\tiny WA}&{\tiny TLE}&{\tiny Test Files}\\%
 \hline%
-addtwonumbers&\cellcolor{red}1/3&\cellcolor{red}1/2&0&0&1&1&0&0&0\\%
+addtwonumbers&\cellcolor{insufficientred}1/3&\cellcolor{insufficientred}1/2&0&0&1&1&0&0&0\\%
 \hline%
-helloworld&\cellcolor{red}2/3&\cellcolor{green}2/2&0&1&1&2&1&0&5\\%
-\hline%
-\end{tabular}
-
-%
-\section{Manual review tracking}%
-\label{sec:Manualreviewtracking}%
-\begin{tabular}{|l|c|c|c|}%
-\hline%
-\rowcolor{cyan}%
-{\tiny Problem}&{\tiny Statement}&{\tiny Validator(s)}&{\tiny Data}\\%
-addtwonumbers&\cellcolor{red}0/3&\cellcolor{red}0/2&\cellcolor{red}0/2\\%
-\hline%
-helloworld&\cellcolor{green}3/3&\cellcolor{red}1/2&\cellcolor{green}2/2\\%
+helloworld&\cellcolor{insufficientred}2/3&\cellcolor{sufficientgreen}2/2&0&1&1&2&1&0&5\\%
 \hline%
 \end{tabular}
 
@@ -65,12 +54,6 @@ addtwonumbers needs at least one WA submission.%
 Add test data%
 \item%
 Add input validators%
-\item%
-Review problem statements%
-\item%
-Review test data%
-\item%
-Review input validators%
 \end{enumerate}
 
 %
@@ -79,28 +62,22 @@ Review input validators%
 \label{sec:addtwonumbers}%
 \subsection{Submissions}%
 \label{subsec:Submissions}%
-\subsection{Accepted}%
-\label{subsec:Accepted}%
-No accepted submissions.%
+\subsubsection{Accepted}%
+\label{ssubsec:Accepted}%
 \begin{itemize}%
 \item%
 add\_two\_jd.py by Jane Doe. 12 lines of code.%
 \end{itemize}
 
 %
-\subsection{Wrong Answer}%
-\label{subsec:WrongAnswer}%
+\subsubsection{Wrong Answer}%
+\label{ssubsec:WrongAnswer}%
 No wrong answer submissions.%
 
 %
-\subsection{Time Limit Exceeded}%
-\label{subsec:TimeLimitExceeded}%
+\subsubsection{Time Limit Exceeded}%
+\label{ssubsec:TimeLimitExceeded}%
 No time limit exceeded submissions.%
-
-%
-\subsection{Problemtools verifyproblem output}%
-\label{subsec:Problemtoolsverifyproblemoutput}%
-Including problemtools verifyproblem output is disabled for this problem. It can be enabled in the crifx{-}problem{-}status.toml file for this problem.
 
 %
 \subsection{Test Cases}%
@@ -113,8 +90,8 @@ Test case descriptions are rendered below if .desc files exist.%
 \label{sec:helloworld}%
 \subsection{Submissions}%
 \label{subsec:Submissions}%
-\subsection{Accepted}%
-\label{subsec:Accepted}%
+\subsubsection{Accepted}%
+\label{ssubsec:Accepted}%
 \begin{itemize}%
 \item%
 hello.py by Homer Simpson. 12 lines of code.%
@@ -123,22 +100,17 @@ hello\_finn.java by Finn Lidbetter. 9 lines of code.%
 \end{itemize}
 
 %
-\subsection{Wrong Answer}%
-\label{subsec:WrongAnswer}%
+\subsubsection{Wrong Answer}%
+\label{ssubsec:WrongAnswer}%
 \begin{itemize}%
 \item%
 lowercase\_only.py by Finn Lidbetter. 9 lines of code.%
 \end{itemize}
 
 %
-\subsection{Time Limit Exceeded}%
-\label{subsec:TimeLimitExceeded}%
+\subsubsection{Time Limit Exceeded}%
+\label{ssubsec:TimeLimitExceeded}%
 No time limit exceeded submissions.%
-
-%
-\subsection{Problemtools verifyproblem output}%
-\label{subsec:Problemtoolsverifyproblemoutput}%
-null
 
 %
 \subsection{Test Cases}%

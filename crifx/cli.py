@@ -77,7 +77,7 @@ def main():
     crifx_dir_path = make_crifx_dir(problemset_root_path)
     config = parse_config(problemset_root_path)
     git_manager = GitManager(problemset_root_path)
-    track_review_status = config.track_review_status()
+    track_review_status = config.track_review_status
     problemset_parser = ProblemSetParser(
         problemset_root_path,
         git_manager,

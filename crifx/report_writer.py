@@ -12,6 +12,7 @@ from pylatex import (
     NoEscape,
     Section,
     Subsection,
+    Subsubsection,
     Tabular,
 )
 from pylatex.base_classes import Environment
@@ -72,6 +73,12 @@ class ReportWriter:
         git_short_commit_id = self.git_manager.get_short_commit_id()
         self.doc.preamble.append(Command("usepackage", "datetime2"))
         self.doc.preamble.append(Command("usepackage", "listings"))
+        self.doc.preamble.append(
+            Command("definecolor", ("insufficientred", "RGB", "255,100,100"))
+        )
+        self.doc.preamble.append(
+            Command("definecolor", ("sufficientgreen", "RGB", "0,210,0"))
+        )
         self.doc.preamble.append(
             Command("title", "CRIFX Contest Preparation Status Report")
         )
@@ -208,6 +215,7 @@ class ReportWriter:
                     header_row,
                     color="cyan",
                 )
+                table.add_hline()
                 for problem in self.problem_set.problems:
                     row = [problem.name]
                     if show_statement_reviews:
@@ -239,9 +247,9 @@ class ReportWriter:
         if requirement == 0:
             return value
         if value < requirement:
-            return NoEscape(r"\cellcolor{red}" + f"{value}/{requirement}")
+            return NoEscape(r"\cellcolor{insufficientred}" + f"{value}/{requirement}")
         else:
-            return NoEscape(r"\cellcolor{green}" + f"{value}/{requirement}")
+            return NoEscape(r"\cellcolor{sufficientgreen}" + f"{value}/{requirement}")
 
     @staticmethod
     def _oxford_list(items: list[str], connector: str):
@@ -273,7 +281,15 @@ class ReportWriter:
                     submission.author.primary_name
                     for submission in problem.ac_submissions
                 }
-                if independent_needed == 1:
+                if not ac_judge_names:
+                    if independent_needed == 1:
+                        enum_env.add_item(f"{problem.name} needs an AC submission.")
+                    else:
+                        enum_env.add_item(
+                            f"{problem.name} needs {independent_needed} AC "
+                            f"submissions."
+                        )
+                elif independent_needed == 1:
                     if requirements.independent_ac == 1:
                         enum_env.add_item(f"{problem.name} needs an AC submission.")
                     else:
@@ -360,6 +376,68 @@ class ReportWriter:
                         f"submissions."
                     )
 
+    def _add_review_needs(
+        self, enum_env, problem_name, reviewers, required_count, review_type
+    ):
+        """Add an item for review needs of a given type."""
+        if len(reviewers) < required_count:
+            reviews_needed = required_count - len(reviewers)
+            if not reviewers:
+                if required_count == 1:
+                    enum_env.add_item(
+                        f"{problem_name} needs at least one {review_type} review."
+                    )
+                else:
+                    enum_env.add_item(
+                        f"{problem_name} needs at least {reviews_needed} "
+                        f"{review_type} reviews."
+                    )
+            elif required_count == 1:
+                enum_env.add_item(
+                    f"{problem_name} needs at least one {review_type} review."
+                )
+            elif reviews_needed == 1:
+                enum_env.add_item(
+                    f"{problem_name} needs at least one more {review_type} review "
+                    f"from someone other than {self._oxford_and(reviewers)}."
+                )
+            else:
+                enum_env.add_item(
+                    f"{problem_name} needs at least {reviews_needed} more "
+                    f"{review_type} reviews from people other than "
+                    f"{self._oxford_and(reviewers)}."
+                )
+
+    def _add_statement_review_needs(self, enum_env):
+        """Add an item for statement reviews needed for each problem."""
+        requirements = self.crifx_config.review_requirements
+        required_count = requirements.statement_reviewers
+        for problem in self.problem_set.problems:
+            reviewers = problem.review_status.statement_reviewed_by
+            self._add_review_needs(
+                enum_env, problem.name, reviewers, required_count, "statement"
+            )
+
+    def _add_data_review_needs(self, enum_env):
+        """Add an item for test data reviews needed for each problem."""
+        requirements = self.crifx_config.review_requirements
+        required_count = requirements.data_reviewers
+        for problem in self.problem_set.problems:
+            reviewers = problem.review_status.data_reviewed_by
+            self._add_review_needs(
+                enum_env, problem.name, reviewers, required_count, "test data"
+            )
+
+    def _add_validator_review_needs(self, enum_env):
+        """Add an item for validator reviews needed for each problem."""
+        requirements = self.crifx_config.review_requirements
+        required_count = requirements.validator_reviewers
+        for problem in self.problem_set.problems:
+            reviewers = problem.review_status.validators_reviewed_by
+            self._add_review_needs(
+                enum_env, problem.name, reviewers, required_count, "validator"
+            )
+
     def _write_how_can_i_help(self):
         """Write the 'How can I help?' section."""
         with self.doc.create(Section("How can I help?")):
@@ -368,11 +446,11 @@ class ReportWriter:
                 self._add_language_group_ac_needs(enum_env)
                 self._add_tle_needs(enum_env)
                 self._add_wa_needs(enum_env)
+                self._add_statement_review_needs(enum_env)
+                self._add_validator_review_needs(enum_env)
+                self._add_data_review_needs(enum_env)
                 enum_env.add_item("Add test data")
                 enum_env.add_item("Add input validators")
-                enum_env.add_item("Review problem statements")
-                enum_env.add_item("Review test data")
-                enum_env.add_item("Review input validators")
 
     def _write_problem_details(self, problem: Problem):
         """Write the details for a problem."""
@@ -380,8 +458,8 @@ class ReportWriter:
         self.doc.append(Command(r"newpage"))
         with self.doc.create(Section(problem.name)):
             with self.doc.create(Subsection("Submissions")):
-                with self.doc.create(Subsection("Accepted")):
-                    if not problem.wa_submissions:
+                with self.doc.create(Subsubsection("Accepted")):
+                    if not problem.ac_submissions:
                         self.doc.append("No accepted submissions.")
                     with self.doc.create(Itemize()) as itemize:
                         for submission in problem.ac_submissions:
@@ -389,7 +467,7 @@ class ReportWriter:
                                 f"{submission.filename} by {submission.author}. "
                                 f"{submission.lines_of_code} lines of code."
                             )
-                with self.doc.create(Subsection("Wrong Answer")):
+                with self.doc.create(Subsubsection("Wrong Answer")):
                     if not problem.wa_submissions:
                         self.doc.append("No wrong answer submissions.")
                     with self.doc.create(Itemize()) as itemize:
@@ -398,7 +476,7 @@ class ReportWriter:
                                 f"{submission.filename} by {submission.author}. "
                                 f"{submission.lines_of_code} lines of code."
                             )
-                with self.doc.create(Subsection("Time Limit Exceeded")):
+                with self.doc.create(Subsubsection("Time Limit Exceeded")):
                     if not problem.tle_submissions:
                         self.doc.append("No time limit exceeded submissions.")
                     with self.doc.create(Itemize()) as itemize:
