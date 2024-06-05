@@ -29,4 +29,5 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: pip install -e '.[dev]'
+      - run: sudo apt-get install texlive-latex-base
       - run: pytest
