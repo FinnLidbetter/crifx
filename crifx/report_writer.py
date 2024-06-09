@@ -62,7 +62,6 @@ class ReportWriter:
             "lmargin": MARGIN,
             "rmargin": MARGIN,
             "bmargin": MARGIN,
-            "includehead": None,
         }
         self.doc = Document(report_tex_path, geometry_options=geometry_options)
         self._set_preamble()
