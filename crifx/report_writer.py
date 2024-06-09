@@ -19,7 +19,7 @@ from pylatex.base_classes import Environment
 from pylatex.package import Package
 
 from crifx.config_parser import Config
-from crifx.contest_objects import Judge, Problem, ProblemSet
+from crifx.contest_objects import Problem, ProblemSet
 from crifx.git_manager import GitManager
 
 MARGIN = "2cm"
@@ -73,6 +73,13 @@ class ReportWriter:
         git_short_commit_id = self.git_manager.get_short_commit_id()
         self.doc.preamble.append(Command("usepackage", "datetime2"))
         self.doc.preamble.append(Command("usepackage", "listings"))
+        self.doc.preamble.append(
+            Command(
+                "usepackage",
+                ("hyperref",),
+                ("colorlinks=true", "urlcolor=blue", "linkcolor=red"),
+            )
+        )
         self.doc.preamble.append(
             Command("definecolor", ("insufficientred", "RGB", "255,100,100"))
         )
@@ -155,7 +162,7 @@ class ReportWriter:
                 table.add_hline()
                 for problem in self.problem_set.problems:
                     row = [
-                        problem.name,
+                        Command("hyperref", (problem.name,), (f"sec:{problem.name}",)),
                         self._coloured_cell(
                             problem.independent_ac_count(), requirements.independent_ac
                         ),
@@ -217,7 +224,9 @@ class ReportWriter:
                 )
                 table.add_hline()
                 for problem in self.problem_set.problems:
-                    row = [problem.name]
+                    row = [
+                        Command("hyperref", (problem.name,), (f"sec:{problem.name}",))
+                    ]
                     if show_statement_reviews:
                         row.append(
                             self._coloured_cell(
