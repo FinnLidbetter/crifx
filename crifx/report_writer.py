@@ -151,7 +151,7 @@ class ReportWriter:
                 header_row = [
                     NoEscape(r"{\tiny Problem}"),
                     NoEscape(r"{\tiny Independent}"),
-                    NoEscape(r"{\tiny Groups}"),
+                    NoEscape(r"{\tiny Lang. Groups}"),
                 ]
                 for language_group_config in language_group_configs:
                     header_row.append(
