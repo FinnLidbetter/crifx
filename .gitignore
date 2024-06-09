@@ -1,7 +1,6 @@
 # Ignore crifx directories created inside test scenarios.
 tests/scenarios/*/.crifx/
 tests/scenarios/*/crifx-report.pdf
-examples/*/test_output/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
