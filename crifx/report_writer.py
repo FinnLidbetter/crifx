@@ -62,6 +62,7 @@ class ReportWriter:
             "lmargin": MARGIN,
             "rmargin": MARGIN,
             "bmargin": MARGIN,
+            "includehead": None,
         }
         self.doc = Document(report_tex_path, geometry_options=geometry_options)
         self._set_preamble()
@@ -78,6 +79,16 @@ class ReportWriter:
                 "usepackage",
                 ("hyperref",),
                 ("colorlinks=true", "urlcolor=blue", "linkcolor=red"),
+            )
+        )
+        self.doc.preamble.append(Command("usepackage", "fancyhdr"))
+        self.doc.preamble.append(Command("pagestyle", ("fancy",)))
+        self.doc.preamble.append(Command("label", "TOP"))
+        self.doc.preamble.append(
+            Command(
+                "fancyhead",
+                (Command("hyperref", ("Back to Top",), ("TOP",)),),
+                ("HR",),
             )
         )
         self.doc.preamble.append(
@@ -278,112 +289,100 @@ class ReportWriter:
         """Get a text 'or' list using the oxford comma."""
         return self._oxford_list(items, "or")
 
-    def _add_independent_ac_needs(self, enum_env):
+    def _add_independent_ac_needs(self, enum_env, problem):
         """Add text list of independent AC submission needs."""
         requirements = self.crifx_config.review_requirements
-        for problem in self.problem_set.problems:
-            if problem.independent_ac_count() < requirements.independent_ac:
-                independent_needed = (
-                    requirements.independent_ac - problem.independent_ac_count()
-                )
-                ac_judge_names = {
-                    submission.author.primary_name
-                    for submission in problem.ac_submissions
-                }
-                if not ac_judge_names:
-                    if independent_needed == 1:
-                        enum_env.add_item(f"{problem.name} needs an AC submission.")
-                    else:
-                        enum_env.add_item(
-                            f"{problem.name} needs {independent_needed} AC "
-                            f"submissions."
-                        )
-                elif independent_needed == 1:
-                    if requirements.independent_ac == 1:
-                        enum_env.add_item(f"{problem.name} needs an AC submission.")
-                    else:
-                        enum_env.add_item(
-                            f"{problem.name} needs at least one more AC submission "
-                            f"from someone other than "
-                            f"{self._oxford_and(sorted(ac_judge_names))}."
-                        )
+        if problem.independent_ac_count() < requirements.independent_ac:
+            independent_needed = (
+                requirements.independent_ac - problem.independent_ac_count()
+            )
+            ac_judge_names = {
+                submission.author.primary_name for submission in problem.ac_submissions
+            }
+            if not ac_judge_names:
+                if independent_needed == 1:
+                    enum_env.add_item(f"{problem.name} needs an AC submission.")
                 else:
                     enum_env.add_item(
-                        f"{problem.name} needs at least {independent_needed} more "
-                        f"AC submissions from people other than "
+                        f"{problem.name} needs {independent_needed} AC " f"submissions."
+                    )
+            elif independent_needed == 1:
+                if requirements.independent_ac == 1:
+                    enum_env.add_item(f"{problem.name} needs an AC submission.")
+                else:
+                    enum_env.add_item(
+                        f"{problem.name} needs at least one more AC submission "
+                        f"from someone other than "
                         f"{self._oxford_and(sorted(ac_judge_names))}."
                     )
+            else:
+                enum_env.add_item(
+                    f"{problem.name} needs at least {independent_needed} more "
+                    f"AC submissions from people other than "
+                    f"{self._oxford_and(sorted(ac_judge_names))}."
+                )
 
-    def _add_language_group_ac_needs(self, enum_env):
+    def _add_language_group_ac_needs(self, enum_env, problem):
         """Add text list of language group AC submission needs."""
         requirements = self.crifx_config.review_requirements
         language_group_configs = self.crifx_config.language_group_configs
         language_groups = [
             group_config.language_group for group_config in language_group_configs
         ]
-        for problem in self.problem_set.problems:
-            groups_covered = problem.language_groups_ac_covered(language_groups)
-            if len(groups_covered) < requirements.language_groups_ac:
-                groups_needed_num = requirements.language_groups_ac - len(
-                    groups_covered
+        groups_covered = problem.language_groups_ac_covered(language_groups)
+        if len(groups_covered) < requirements.language_groups_ac:
+            groups_needed_num = requirements.language_groups_ac - len(groups_covered)
+            groups_not_covered_names = [
+                config.identifier
+                for config in language_group_configs
+                if config.language_group not in groups_covered
+            ]
+            if groups_needed_num == 1:
+                enum_env.add_item(
+                    f"{problem.name} needs at least one more AC submission from "
+                    f"any of the following language groups: "
+                    f"{self._oxford_or(groups_not_covered_names)}."
                 )
-                groups_not_covered_names = [
-                    config.identifier
-                    for config in language_group_configs
-                    if config.language_group not in groups_covered
-                ]
-                if groups_needed_num == 1:
-                    enum_env.add_item(
-                        f"{problem.name} needs at least one more AC submission from "
-                        f"any of the following language groups: "
-                        f"{self._oxford_or(groups_not_covered_names)}."
-                    )
-                else:
-                    enum_env.add_item(
-                        f"{problem.name} needs at least {groups_needed_num} more AC "
-                        f"submissions from any of the following language groups: "
-                        f"{self._oxford_or(groups_not_covered_names)}."
-                    )
+            else:
+                enum_env.add_item(
+                    f"{problem.name} needs at least {groups_needed_num} more AC "
+                    f"submissions from any of the following language groups: "
+                    f"{self._oxford_or(groups_not_covered_names)}."
+                )
 
-    def _add_tle_needs(self, enum_env):
-        """Add a text line for TLE submission needs for each problem."""
+    def _add_tle_needs(self, enum_env, problem):
+        """Add a text line for TLE submission needs for a problem."""
         requirements = self.crifx_config.review_requirements
-        for problem in self.problem_set.problems:
-            if len(problem.tle_submissions) < requirements.submissions_tle:
-                tle_needed = requirements.submissions_tle - len(problem.tle_submissions)
-                if requirements.submissions_tle == 1:
-                    enum_env.add_item(
-                        f"{problem.name} needs at least one TLE submission."
-                    )
-                elif tle_needed == 1:
-                    enum_env.add_item(
-                        f"{problem.name} needs at least one more TLE submission."
-                    )
-                else:
-                    enum_env.add_item(
-                        f"{problem.name} needs at least {tle_needed} more TLE "
-                        f"submissions."
-                    )
+        if len(problem.tle_submissions) < requirements.submissions_tle:
+            tle_needed = requirements.submissions_tle - len(problem.tle_submissions)
+            if requirements.submissions_tle == 1:
+                enum_env.add_item(f"{problem.name} needs at least one TLE submission.")
+            elif tle_needed == 1:
+                enum_env.add_item(
+                    f"{problem.name} needs at least one more TLE submission."
+                )
+            else:
+                enum_env.add_item(
+                    f"{problem.name} needs at least {tle_needed} more TLE "
+                    f"submissions."
+                )
 
-    def _add_wa_needs(self, enum_env):
+    def _add_wa_needs(self, enum_env, problem):
         """Add a text line for WA submission needs for each problem."""
         requirements = self.crifx_config.review_requirements
-        for problem in self.problem_set.problems:
-            if len(problem.wa_submissions) < requirements.submissions_wa:
-                wa_needed = requirements.submissions_wa - len(problem.wa_submissions)
-                if requirements.submissions_wa == 1:
-                    enum_env.add_item(
-                        f"{problem.name} needs at least one WA submission."
-                    )
-                elif wa_needed == 1:
-                    enum_env.add_item(
-                        f"{problem.name} needs at least one more WA submission."
-                    )
-                else:
-                    enum_env.add_item(
-                        f"{problem.name} needs at least {wa_needed} more WA "
-                        f"submissions."
-                    )
+        if len(problem.wa_submissions) < requirements.submissions_wa:
+            wa_needed = requirements.submissions_wa - len(problem.wa_submissions)
+            if requirements.submissions_wa == 1:
+                enum_env.add_item(f"{problem.name} needs at least one WA submission.")
+            elif wa_needed == 1:
+                enum_env.add_item(
+                    f"{problem.name} needs at least one more WA submission."
+                )
+            else:
+                enum_env.add_item(
+                    f"{problem.name} needs at least {wa_needed} more WA "
+                    f"submissions."
+                )
 
     def _add_review_needs(
         self, enum_env, problem_name, reviewers, required_count, review_type
@@ -417,47 +416,51 @@ class ReportWriter:
                     f"{self._oxford_and(reviewers)}."
                 )
 
-    def _add_statement_review_needs(self, enum_env):
-        """Add an item for statement reviews needed for each problem."""
+    def _add_statement_review_needs(self, enum_env, problem):
+        """Add an item for statement reviews needed for a problem."""
         requirements = self.crifx_config.review_requirements
         required_count = requirements.statement_reviewers
-        for problem in self.problem_set.problems:
-            reviewers = problem.review_status.statement_reviewed_by
-            self._add_review_needs(
-                enum_env, problem.name, reviewers, required_count, "statement"
-            )
+        reviewers = problem.review_status.statement_reviewed_by
+        self._add_review_needs(
+            enum_env, problem.name, reviewers, required_count, "statement"
+        )
 
-    def _add_data_review_needs(self, enum_env):
-        """Add an item for test data reviews needed for each problem."""
+    def _add_data_review_needs(self, enum_env, problem):
+        """Add an item for test data reviews needed for a problem."""
         requirements = self.crifx_config.review_requirements
         required_count = requirements.data_reviewers
-        for problem in self.problem_set.problems:
-            reviewers = problem.review_status.data_reviewed_by
-            self._add_review_needs(
-                enum_env, problem.name, reviewers, required_count, "test data"
-            )
+        reviewers = problem.review_status.data_reviewed_by
+        self._add_review_needs(
+            enum_env, problem.name, reviewers, required_count, "test data"
+        )
 
-    def _add_validator_review_needs(self, enum_env):
+    def _add_validator_review_needs(self, enum_env, problem):
         """Add an item for validator reviews needed for each problem."""
         requirements = self.crifx_config.review_requirements
         required_count = requirements.validator_reviewers
-        for problem in self.problem_set.problems:
-            reviewers = problem.review_status.validators_reviewed_by
-            self._add_review_needs(
-                enum_env, problem.name, reviewers, required_count, "validator"
-            )
+        reviewers = problem.review_status.validators_reviewed_by
+        self._add_review_needs(
+            enum_env, problem.name, reviewers, required_count, "validator"
+        )
 
     def _write_how_can_i_help(self):
         """Write the 'How can I help?' section."""
         with self.doc.create(Section("How can I help?")):
             with self.doc.create(Enumerate()) as enum_env:
-                self._add_independent_ac_needs(enum_env)
-                self._add_language_group_ac_needs(enum_env)
-                self._add_tle_needs(enum_env)
-                self._add_wa_needs(enum_env)
-                self._add_statement_review_needs(enum_env)
-                self._add_validator_review_needs(enum_env)
-                self._add_data_review_needs(enum_env)
+                for problem in self.problem_set.problems:
+                    self._add_independent_ac_needs(enum_env, problem)
+                for problem in self.problem_set.problems:
+                    self._add_language_group_ac_needs(enum_env, problem)
+                for problem in self.problem_set.problems:
+                    self._add_tle_needs(enum_env, problem)
+                for problem in self.problem_set.problems:
+                    self._add_wa_needs(enum_env, problem)
+                for problem in self.problem_set.problems:
+                    self._add_statement_review_needs(enum_env, problem)
+                for problem in self.problem_set.problems:
+                    self._add_validator_review_needs(enum_env, problem)
+                for problem in self.problem_set.problems:
+                    self._add_data_review_needs(enum_env, problem)
                 enum_env.add_item("Add test data")
                 enum_env.add_item("Add input validators")
 
@@ -466,6 +469,15 @@ class ReportWriter:
         assert self.doc is not None
         self.doc.append(Command(r"newpage"))
         with self.doc.create(Section(problem.name)):
+            with self.doc.create(Subsection("How can I help?")):
+                with self.doc.create(Enumerate()) as enum_env:
+                    self._add_independent_ac_needs(enum_env, problem)
+                    self._add_language_group_ac_needs(enum_env, problem)
+                    self._add_tle_needs(enum_env, problem)
+                    self._add_wa_needs(enum_env, problem)
+                    self._add_statement_review_needs(enum_env, problem)
+                    self._add_validator_review_needs(enum_env, problem)
+                    self._add_data_review_needs(enum_env, problem)
             with self.doc.create(Subsection("Submissions")):
                 with self.doc.create(Subsubsection("Accepted")):
                     if not problem.ac_submissions:

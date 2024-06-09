@@ -5,16 +5,20 @@
 \usepackage{textcomp}%
 \usepackage{lastpage}%
 \usepackage{geometry}%
-\geometry{tmargin=2cm,lmargin=2cm,rmargin=2cm,bmargin=2cm}%
+\geometry{tmargin=2cm,lmargin=2cm,rmargin=2cm,bmargin=2cm,includehead=None}%
 \usepackage[table]{xcolor}%
 %
 \usepackage{datetime2}%
 \usepackage{listings}%
 \usepackage[colorlinks=true,urlcolor=blue,linkcolor=red]{hyperref}%
+\usepackage{fancyhdr}%
+\pagestyle{fancy}%
+\label{TOP}%
+\fancyhead[HR]{\hyperref[TOP]{Back to Top}}%
 \definecolor{insufficientred}{RGB}{255,100,100}%
 \definecolor{sufficientgreen}{RGB}{0,210,0}%
 \title{CRIFX Contest Preparation Status Report}%
-\date{Compiled \today~at \DTMcurrenttime\DTMcurrentzone~for commit 553d6dec}%
+\date{Compiled \today~at \DTMcurrenttime\DTMcurrentzone~for commit b2968eb6}%
 %
 \begin{document}%
 \normalsize%
@@ -83,6 +87,26 @@ Add input validators%
 \newpage%
 \section{addtwonumbers}%
 \label{sec:addtwonumbers}%
+\subsection{How can I help?}%
+\label{subsec:HowcanIhelp?}%
+\begin{enumerate}%
+\item%
+addtwonumbers needs at least 2 more AC submissions from people other than Jane Doe.%
+\item%
+addtwonumbers needs at least one more AC submission from any of the following language groups: c/c++ or java/kotlin.%
+\item%
+addtwonumbers needs at least one TLE submission.%
+\item%
+addtwonumbers needs at least one WA submission.%
+\item%
+addtwonumbers needs at least 3 statement reviews.%
+\item%
+addtwonumbers needs at least 2 validator reviews.%
+\item%
+addtwonumbers needs at least 2 test data reviews.%
+\end{enumerate}
+
+%
 \subsection{Submissions}%
 \label{subsec:Submissions}%
 \subsubsection{Accepted}%
@@ -111,6 +135,18 @@ Test case descriptions are rendered below if .desc files exist.%
 \newpage%
 \section{helloworld}%
 \label{sec:helloworld}%
+\subsection{How can I help?}%
+\label{subsec:HowcanIhelp?}%
+\begin{enumerate}%
+\item%
+helloworld needs at least one more AC submission from someone other than Finn Lidbetter and Homer Simpson.%
+\item%
+helloworld needs at least one TLE submission.%
+\item%
+helloworld needs at least one more validator review from someone other than Homer Simpson.%
+\end{enumerate}
+
+%
 \subsection{Submissions}%
 \label{subsec:Submissions}%
 \subsubsection{Accepted}%
