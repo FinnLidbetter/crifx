@@ -44,9 +44,12 @@ def _make_argument_parser() -> argparse.ArgumentParser:
         help="Set verbose logging mode.",
     )
     parser.add_argument(
-        "--check",
-        action="store_true",
-        help="Check if the crifx report is up-to-date, without modifying any files.",
+        "-o",
+        "--output-dir",
+        default=None,
+        help="Optional directory path to which to write the crifx report pdf. "
+        "If omitted, then the report will be written to the problemset "
+        "root directory.",
     )
     return parser
 
@@ -60,8 +63,6 @@ def main():
     log_format = (
         "[%(asctime)s][%(levelname)s][%(name)s] %(message)s\t[%(filename)s:%(lineno)d]"
     )
-    if args.check:
-        raise NotImplementedError("Check-only mode is not supported yet")
     logging.basicConfig(level=log_level, format=log_format)
     logging.debug("Running crifx-cli from %s", os.getcwd())
     if args.path is None:
@@ -74,7 +75,10 @@ def main():
             os.getcwd(),
         )
         sys.exit(CRIFX_ERROR_EXIT_CODE)
-    crifx_dir_path = make_crifx_dir(problemset_root_path)
+    if args.output_dir is None:
+        output_dir = problemset_root_path
+    else:
+        output_dir = os.path.abspath(args.output_dir)
     config = parse_config(problemset_root_path)
     git_manager = GitManager(problemset_root_path)
     track_review_status = config.track_review_status
@@ -86,9 +90,10 @@ def main():
     )
     problemset = problemset_parser.parse_problemset()
     writer = ReportWriter(problemset, config, git_manager)
+    crifx_dir_path = make_crifx_dir(output_dir)
     writer.build_report(crifx_dir_path)
     writer.write_tex(crifx_dir_path)
-    writer.write_pdf(problemset_root_path)
+    writer.write_pdf(output_dir)
 
 
 if __name__ == "__main__":
