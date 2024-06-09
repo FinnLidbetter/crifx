@@ -79,6 +79,9 @@ def main():
         output_dir = problemset_root_path
     else:
         output_dir = os.path.abspath(args.output_dir)
+        if not os.path.isdir(output_dir):
+            logging.error("Specified output directory '%s' does not exist", output_dir)
+            sys.exit(CRIFX_ERROR_EXIT_CODE)
     config = parse_config(problemset_root_path)
     git_manager = GitManager(problemset_root_path)
     track_review_status = config.track_review_status
