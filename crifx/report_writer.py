@@ -128,7 +128,7 @@ class ReportWriter:
         requirements = self.crifx_config.review_requirements
         num_columns = 7 + len(language_group_configs)
         column_spec = "|l|" + "c|" * (num_columns - 1)
-        with self.doc.create(Section("Submissions summary")):
+        with self.doc.create(Section("Submissions summary", numbering=False)):
             with self.doc.create(Tabular(column_spec)) as table:
                 table.add_hline()
                 header_group_row = [
@@ -219,7 +219,7 @@ class ReportWriter:
             return
         num_columns = 1 + review_columns
         column_spec = "|l|" + "c|" * (num_columns - 1)
-        with self.doc.create(Section("Manual review tracking")):
+        with self.doc.create(Section("Manual review tracking", numbering=False)):
             with self.doc.create(Tabular(column_spec)) as table:
                 table.add_hline()
                 header_row = [NoEscape(r"{\tiny Problem}")]
@@ -445,7 +445,7 @@ class ReportWriter:
 
     def _write_how_can_i_help(self):
         """Write the 'How can I help?' section."""
-        with self.doc.create(Section("How can I help?")):
+        with self.doc.create(Section("How can I help?", numbering=False)):
             with self.doc.create(Enumerate()) as enum_env:
                 for problem in self.problem_set.problems:
                     self._add_independent_ac_needs(enum_env, problem)
@@ -469,7 +469,7 @@ class ReportWriter:
         assert self.doc is not None
         self.doc.append(Command(r"newpage"))
         with self.doc.create(Section(problem.name)):
-            with self.doc.create(Subsection("How can I help?")):
+            with self.doc.create(Subsection("How can I help?", numbering=False)):
                 with self.doc.create(Enumerate()) as enum_env:
                     self._add_independent_ac_needs(enum_env, problem)
                     self._add_language_group_ac_needs(enum_env, problem)
@@ -478,8 +478,8 @@ class ReportWriter:
                     self._add_statement_review_needs(enum_env, problem)
                     self._add_validator_review_needs(enum_env, problem)
                     self._add_data_review_needs(enum_env, problem)
-            with self.doc.create(Subsection("Submissions")):
-                with self.doc.create(Subsubsection("Accepted")):
+            with self.doc.create(Subsection("Submissions", numbering=False)):
+                with self.doc.create(Subsubsection("Accepted", numbering=False)):
                     if not problem.ac_submissions:
                         self.doc.append("No accepted submissions.")
                     with self.doc.create(Itemize()) as itemize:
@@ -488,7 +488,7 @@ class ReportWriter:
                                 f"{submission.filename} by {submission.author}. "
                                 f"{submission.lines_of_code} lines of code."
                             )
-                with self.doc.create(Subsubsection("Wrong Answer")):
+                with self.doc.create(Subsubsection("Wrong Answer", numbering=False)):
                     if not problem.wa_submissions:
                         self.doc.append("No wrong answer submissions.")
                     with self.doc.create(Itemize()) as itemize:
@@ -497,7 +497,9 @@ class ReportWriter:
                                 f"{submission.filename} by {submission.author}. "
                                 f"{submission.lines_of_code} lines of code."
                             )
-                with self.doc.create(Subsubsection("Time Limit Exceeded")):
+                with self.doc.create(
+                    Subsubsection("Time Limit Exceeded", numbering=False)
+                ):
                     if not problem.tle_submissions:
                         self.doc.append("No time limit exceeded submissions.")
                     with self.doc.create(Itemize()) as itemize:
@@ -506,7 +508,7 @@ class ReportWriter:
                                 f"{submission.filename} by {submission.author}. "
                                 f"{submission.lines_of_code} lines of code."
                             )
-            with self.doc.create(Subsection("Test Cases")):
+            with self.doc.create(Subsection("Test Cases", numbering=False)):
                 self.doc.append(
                     "Test case descriptions are rendered below if .desc files exist."
                 )
