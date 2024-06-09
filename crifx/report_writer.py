@@ -77,7 +77,7 @@ class ReportWriter:
             Command(
                 "usepackage",
                 ("hyperref",),
-                ("colorlinks=true", "urlcolor=blue", "linkcolor=red"),
+                ("colorlinks=true", "urlcolor=blue", "linkcolor=blue"),
             )
         )
         self.doc.preamble.append(Command("usepackage", "fancyhdr"))
