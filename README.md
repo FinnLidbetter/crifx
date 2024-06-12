@@ -122,3 +122,91 @@ be added to this list if they have inspected the generated test data and after d
 so they cannot think of another test case that should be added to ensure that correct 
 submissions will be judged as correct and incorrect submissions will be judged as 
 incorrect.
+
+## Example
+Below is an example `crifx.toml` file.
+```toml
+# Crifx configuration file example.
+
+# The github repository url for this problemset. This can be used to include
+# hyperlinks to GitHub Issues for each problem in the report.
+github_repo_url = "https://github.com/FinnLidbetter/crifx"
+
+# Section for defining minimum numbers of submissions and manual reviews.
+[review_requirements]
+# There must be AC submissions from at least 3 distinct judges.
+independent_ac = 3
+# There must be at least 2 distinct language groups with at least one AC
+# submission written in a language in the group.
+language_groups = 2
+# There must be at least one wrong_answer submission.
+submissions_wa = 1
+# There must be at least one time_limit_exceeded submission.
+submissions_tle = 1
+# There must be at least 3 judges who have reviewed the problem statement.
+statement_reviewers = 3
+# There must be at least 2 judges who have reviewed the input validators.
+validator_reviewers = 2
+# There must be at least 2 judges who have reviewed the test data.
+data_reviewers = 2
+
+# Define judge names in `[[judge]]` tables.
+[[judge]]
+# Primary name is required.
+primary_name = "Jane Doe"
+# git_name is not required.
+# git_name = "janedoe"
+# Aliases is a list of zero or more alternative names.
+aliases = ["jd", "jane"]
+
+[[judge]]
+primary_name = "Homer Simpson"
+git_name = "homers123"
+aliases = []
+
+# Tables for defining language groups.
+[[language_group]]
+# Non alphanumeric characters can be used in the language group name.
+name = "c/c++"
+# The names of the languages in the group. Language names are cast to
+# lowercase before comparison to language names known to crifx.
+languages = ["C", "C++"]
+# The number of AC submissions required for this group.
+required_ac_count = 0
+
+[[language_group]]
+name = "java/kotlin"
+languages = ["Java", "Kotlin"]
+required_ac_count = 0
+
+[[language_group]]
+name = "python"
+languages = ["Python"]
+required_ac_count = 0
+```
+Here is an example `crifx-problem-status.toml` file inside the 
+`examples/example_problemset/helloworld/` directory.
+```toml
+# GitHub Issue id number associated with this problem.
+github_issue_id = 1
+
+[review_status]
+# List of names of judges who have reviewed the problem statement.
+statement_reviewed_by = [
+    "Alice",
+    "Bob",
+    "Jane Doe",
+]
+# List of names of judges who have reviewed the input validator(s).
+validators_reviewed_by = [
+    "Homer Simpson",
+]
+# List of names of judges who have reviewed the test data.
+data_reviewed_by = [
+    "Homer Simpson",
+    "Bob",
+]
+```
+
+This example report screenshot is produced from the example in `examples/example_problemset`
+![Example crifx report](docs/images/example-crifx-report.pdf)
