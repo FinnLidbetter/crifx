@@ -209,6 +209,6 @@ data_reviewed_by = [
 ```
 
 This example report screenshot is produced from the example in `examples/example_problemset`
-![Example report page 1](docs/images/example-report-page-1.png)
-![Example report page 2](docs/images/example-report-page-2.png)
-![Example_report_page_3](docs/images/example-report-page-3.png)
+![Example report page 1](doc/images/example-report-page-1.png)
+![Example report page 2](doc/images/example-report-page-2.png)
+![Example_report_page_3](doc/images/example-report-page-3.png)
