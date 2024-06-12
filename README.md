@@ -7,11 +7,18 @@ tasks that are completed and tasks that are still outstanding in preparing
 an icpc-style competitive programming contest.
 
 ## Installation
-Install crifx with `pip install crifx`. (Does not work yet.)
+Install crifx with `pip install crifx`. Building the report will require some
+TeX packages. For example, on Ubuntu 22.04 installing the `texlive-latex-extra` 
+apt package with `apt-get install texlive-latex-extra` should be sufficient.
+
+If you are using a different operating system, and you are able to run crifx, then 
+please share your experience by opening an Issue and I would be pleased to update
+installation instructions accordingly.
 
 ## Using crifx
 In the root directory for a problemset, run `crifx` from within a problemset nested
-directory, or run `crifx /path/to/problemset/root` (not yet implemented). 
+directory, or run `crifx /path/to/problemset/root` from anywhere to generate a report
+for the problemset at the specified path. 
 If there is no `crifx.toml` configuration file in the problemset root directory, 
 then a report will be created using default configuration values.
 

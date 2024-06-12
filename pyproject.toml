@@ -25,6 +25,9 @@ classifiers = [
 [project.scripts]
 crifx = "crifx.cli:main"
 
+[project.urls]
+Source = "https://github.com/FinnLidbetter/crifx"
+
 [project.optional-dependencies]
 dev = ["black", "ruff", "tox", "mypy", "pytest"]
 
