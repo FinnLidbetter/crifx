@@ -2,11 +2,63 @@
 
 import os
 import uuid
+import zipfile
+from pathlib import Path
 
+import pygit2
 import pytest
 
 from crifx.contest_objects import Judge, Judgement, ProgrammingLanguage, Submission
 from crifx.git_manager import GitUser
+
+
+@pytest.fixture(scope="session", autouse=True)
+def remove_git_config_paths():
+    """Remove git configurations from pygit2 to improve test reproducibility."""
+    levels = [
+        pygit2.enums.ConfigLevel.GLOBAL,
+        pygit2.enums.ConfigLevel.XDG,
+        pygit2.enums.ConfigLevel.SYSTEM,
+    ]
+    for level in levels:
+        pygit2.settings.search_path[level] = ""
+
+
+class TemporaryRepository:
+    """
+    Context managed class for creating a repository at a temporary path.
+
+    The provided name must be a .zip file name.
+    """
+
+    def __init__(self, name, tmp_path):
+        self.name = name
+        self.tmp_path = tmp_path
+
+    def __enter__(self):
+        path = Path(__file__).parent.joinpath("data", self.name)
+        temp_repo_path = Path(self.tmp_path).joinpath(path.stem)
+        with zipfile.ZipFile(path) as zipped_data_file:
+            zipped_data_file.extractall(self.tmp_path)
+        return temp_repo_path
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        pass
+
+
+@pytest.fixture
+def empty_repo(tmp_path):
+    """Initialise a temporary empty (but non-bare) repository."""
+    with TemporaryRepository("empty_repo.zip", tmp_path) as path:
+        yield pygit2.Repository(path)
+
+
+@pytest.fixture
+def global_git_config_path(tmp_path):
+    """Set and return a global git config path."""
+    level = pygit2.enums.ConfigLevel.GLOBAL
+    pygit2.settings.search_path[level] = str(tmp_path)
+    yield os.path.join(tmp_path, ".gitconfig")
 
 
 @pytest.fixture
