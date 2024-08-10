@@ -468,7 +468,9 @@ class ReportWriter:
         assert self.doc is not None
         self.doc.append(Command(r"newpage"))
         with self.doc.create(Section(problem.name)):
-            with self.doc.create(Subsection("How can I help?", numbering=False)):
+            with self.doc.create(
+                Subsection("How can I help?", numbering=False, label=False)
+            ):
                 with self.doc.create(Enumerate()) as enum_env:
                     self._add_independent_ac_needs(enum_env, problem)
                     self._add_language_group_ac_needs(enum_env, problem)
@@ -477,8 +479,12 @@ class ReportWriter:
                     self._add_statement_review_needs(enum_env, problem)
                     self._add_validator_review_needs(enum_env, problem)
                     self._add_data_review_needs(enum_env, problem)
-            with self.doc.create(Subsection("Submissions", numbering=False)):
-                with self.doc.create(Subsubsection("Accepted", numbering=False)):
+            with self.doc.create(
+                Subsection("Submissions", numbering=False, label=False)
+            ):
+                with self.doc.create(
+                    Subsubsection("Accepted", numbering=False, label=False)
+                ):
                     if not problem.ac_submissions:
                         self.doc.append("No accepted submissions.")
                     with self.doc.create(Itemize()) as itemize:
@@ -487,7 +493,9 @@ class ReportWriter:
                                 f"{submission.filename} by {submission.author}. "
                                 f"{submission.lines_of_code} lines of code."
                             )
-                with self.doc.create(Subsubsection("Wrong Answer", numbering=False)):
+                with self.doc.create(
+                    Subsubsection("Wrong Answer", numbering=False, label=False)
+                ):
                     if not problem.wa_submissions:
                         self.doc.append("No wrong answer submissions.")
                     with self.doc.create(Itemize()) as itemize:
@@ -497,7 +505,7 @@ class ReportWriter:
                                 f"{submission.lines_of_code} lines of code."
                             )
                 with self.doc.create(
-                    Subsubsection("Time Limit Exceeded", numbering=False)
+                    Subsubsection("Time Limit Exceeded", numbering=False, label=False)
                 ):
                     if not problem.tle_submissions:
                         self.doc.append("No time limit exceeded submissions.")
@@ -507,7 +515,9 @@ class ReportWriter:
                                 f"{submission.filename} by {submission.author}. "
                                 f"{submission.lines_of_code} lines of code."
                             )
-            with self.doc.create(Subsection("Test Cases", numbering=False)):
+            with self.doc.create(
+                Subsection("Test Cases", numbering=False, label=False)
+            ):
                 self.doc.append(
                     "Test case descriptions are rendered below if .desc files exist."
                 )
