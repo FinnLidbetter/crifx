@@ -5,7 +5,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 
 from pygit2 import Repository, Signature, discover_repository
-from pygit2.enums import BlameFlag, SortMode
+from pygit2.enums import BlameFlag, FileStatus, SortMode
 
 
 @dataclass(frozen=True)
@@ -55,6 +55,15 @@ class GitManager:
         if not os.path.isfile(abs_path):
             raise ValueError(f"Path '{abs_path}' is not a file.")
         path = os.path.relpath(abs_path, self.repo_root)
+        file_status = self.repo.status_file(path)
+        if file_status in (FileStatus.WT_NEW, FileStatus.INDEX_NEW):
+            # Handle cases where the file is new and untracked or staged but
+            # not committed. Assume that the current git user is the author.
+            name = self.repo.config.get_global_config()["user.name"]
+            email = self.repo.config.get_global_config()["user.email"]
+            if name is not None and email is not None:
+                return GitUser.from_signature(Signature(name, email))
+            return None
         blame = self.repo.blame(
             path, flags=BlameFlag.NORMAL | BlameFlag.IGNORE_WHITESPACE
         )

@@ -19,6 +19,24 @@ def tmp_file_path(tmp_path):
 
 
 @pytest.fixture
+def make_file_at_path():
+    """Write a file in the provided directory and delete it afterwards."""
+    written_files = []
+
+    def _func(dir_path):
+        unique_id = str(uuid.uuid4())
+        file_name = f"crifx-tmp_file-{unique_id}.txt"
+        file_path = os.path.join(dir_path, file_name)
+        open(file_path, "a").close()
+        written_files.append(file_path)
+        return file_path
+
+    yield _func
+    for file in written_files:
+        os.remove(file)
+
+
+@pytest.fixture
 def examples_path(pytestconfig):
     """Get the path to the examples directory."""
     yield os.path.join(pytestconfig.rootpath, "examples")
