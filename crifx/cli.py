@@ -5,6 +5,7 @@ import logging
 import os
 import sys
 
+from crifx import __version__
 from crifx.config_parser import parse_config
 from crifx.dir_layout_parsing import find_contest_problems_root
 from crifx.git_manager import GitManager
@@ -51,12 +52,20 @@ def _make_argument_parser() -> argparse.ArgumentParser:
         "If omitted, then the report will be written to the problemset "
         "root directory.",
     )
+    parser.add_argument(
+        "--version",
+        action="store_true",
+        help="Print the version and exit.",
+    )
     return parser
 
 
 def main():
     """Entry point for crifx."""
     args = _make_argument_parser().parse_args()
+    if args.version:
+        print(__version__)
+        return
     log_level = logging.INFO
     if args.verbose:
         log_level = logging.DEBUG

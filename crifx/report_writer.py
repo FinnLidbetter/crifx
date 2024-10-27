@@ -18,6 +18,7 @@ from pylatex import (
 from pylatex.base_classes import Environment
 from pylatex.package import Package
 
+from crifx import __version__
 from crifx.config_parser import Config
 from crifx.contest_objects import Problem, ProblemSet
 from crifx.git_manager import GitManager
@@ -107,7 +108,7 @@ class ReportWriter:
         self.doc.preamble.append(
             Command("title", "CRIFX Contest Preparation Status Report")
         )
-        self.doc.preamble.append(Command("author", ""))
+        self.doc.preamble.append(Command("author", "CRIFX " + __version__))
         self.doc.preamble.append(
             Command(
                 "date",
