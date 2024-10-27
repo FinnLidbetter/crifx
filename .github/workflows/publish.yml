@@ -1,4 +1,4 @@
-name: Upload Crifx python package to PyPI when a release is created
+name: Publish release to PyPI
 
 on:
   release:
