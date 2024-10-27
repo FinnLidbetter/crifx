@@ -55,6 +55,25 @@ class Problem:
             accepted_authors.append(submission.author)
         return len(accepted_authors)
 
+    def ac_lines_of_code_min(self):
+        """Get the minimum Lines of Code among AC submissions to this problem."""
+        ac_min = None
+        for submission in self.ac_submissions:
+            if ac_min is None or submission.lines_of_code < ac_min:
+                ac_min = submission.lines_of_code
+        return ac_min
+
+    def ac_lines_of_code_median(self):
+        """Get the median Lines of Code among AC submissions to this problem."""
+        ac_loc_vals = []
+        for submission in self.ac_submissions:
+            ac_loc_vals.append(submission.lines_of_code)
+        ac_loc_vals.sort()
+        middle = len(ac_loc_vals) // 2
+        if len(ac_loc_vals) % 2 == 0:
+            return (ac_loc_vals[middle - 1] + ac_loc_vals[middle]) // 2
+        return ac_loc_vals[middle]
+
     def ac_languages(self) -> defaultdict[ProgrammingLanguage, int]:
         """Get the number of AC submissions in each language."""
         language_counts: defaultdict[ProgrammingLanguage, int] = defaultdict(int)

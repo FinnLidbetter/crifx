@@ -36,6 +36,13 @@ LISTING_OPTIONS = [
 ]
 
 
+def truncate(word, characters_max=10):
+    """Get a truncated string representation."""
+    if len(word) > characters_max:
+        return word[: characters_max - 2] + "..."
+    return word
+
+
 class LstListing(Environment):
     """LstListing environment."""
 
@@ -127,7 +134,7 @@ class ReportWriter:
             group_config.language_group for group_config in language_group_configs
         ]
         requirements = self.crifx_config.review_requirements
-        num_columns = 7 + len(language_group_configs)
+        num_columns = 9 + len(language_group_configs)
         column_spec = "|l|" + "c|" * (num_columns - 1)
         with self.doc.create(Section("Submissions summary", numbering=False)):
             with self.doc.create(Tabular(column_spec)) as table:
@@ -138,12 +145,14 @@ class ReportWriter:
                     # Independent, Groups, language_groups, Sum
                     MultiColumn(
                         3 + len(language_group_configs),
-                        align="c",
+                        align="c|",
                         data=NoEscape(r"{\tiny Solutions}"),
                     ),
                     # WA, TLE
+                    MultiColumn(2, align="c|", data=NoEscape(r"{\tiny Non-solutions}")),
+                    # AC LOC.
                     MultiColumn(
-                        2, align="|c|", data=NoEscape(r"{\tiny Non-solutions}")
+                        2, align="c|", data=NoEscape(r"{\tiny AC Lines of Code}")
                     ),
                     # Test cases
                     "",
@@ -157,13 +166,19 @@ class ReportWriter:
                 ]
                 for language_group_config in language_group_configs:
                     header_row.append(
-                        NoEscape(r"{\tiny " + language_group_config.identifier + r"}")
+                        NoEscape(
+                            r"{\tiny "
+                            + truncate(language_group_config.identifier, 10)
+                            + r"}"
+                        )
                     )
                 header_row.extend(
                     [
                         NoEscape(r"{\tiny Sum}"),
                         NoEscape(r"{\tiny WA}"),
                         NoEscape(r"{\tiny TLE}"),
+                        NoEscape(r"{\tiny Min.}"),
+                        NoEscape(r"{\tiny Med.}"),
                         NoEscape(r"{\tiny Test Files}"),
                     ]
                 )
@@ -174,7 +189,11 @@ class ReportWriter:
                 table.add_hline()
                 for problem in self.problem_set.problems:
                     row = [
-                        Command("hyperref", (problem.name,), (f"sec:{problem.name}",)),
+                        Command(
+                            "hyperref",
+                            (truncate(problem.name, 16),),
+                            (f"sec:{problem.name}",),
+                        ),
                         self._coloured_cell(
                             problem.independent_ac_count(), requirements.independent_ac
                         ),
@@ -199,6 +218,8 @@ class ReportWriter:
                             len(problem.ac_submissions),
                             len(problem.wa_submissions),
                             len(problem.tle_submissions),
+                            str(problem.ac_lines_of_code_min()),
+                            str(problem.ac_lines_of_code_median()),
                             len(problem.test_cases),
                         ]
                     )
