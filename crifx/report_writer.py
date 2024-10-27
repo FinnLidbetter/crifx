@@ -113,7 +113,7 @@ class ReportWriter:
             Command(
                 "date",
                 NoEscape(
-                    f"Compiled \\today~at \\DTMcurrenttime\\DTMcurrentzone~"
+                    f"Report compiled \\today~at \\DTMcurrenttime\\DTMcurrentzone~"
                     f"for commit {git_short_commit_id}"
                 ),
             )
