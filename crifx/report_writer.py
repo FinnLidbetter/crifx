@@ -32,6 +32,7 @@ LISTING_OPTIONS = [
     NoEscape(r"backgroundcolor=\color{lightgray}"),
     "framexleftmargin=1em",
     "framexrightmargin=1em",
+    "breaklines=true",
 ]
 
 
