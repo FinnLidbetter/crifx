@@ -29,7 +29,7 @@ crifx = "crifx.cli:main"
 Source = "https://github.com/FinnLidbetter/crifx"
 
 [project.optional-dependencies]
-dev = ["black", "ruff", "tox", "mypy", "pytest"]
+dev = ["black", "ruff", "tox", "mypy", "pytest", "build"]
 
 [tool.black]
 line_length = 88
@@ -63,7 +63,7 @@ ignore_missing_imports = true
 [tool.tox]
 legacy_tox_ini = """
     [tox]
-    envlist = format, lint, type, py{311,312}
+    envlist = format, lint, type, py{311,312}, package
     requires =
         tox>=4
     isolated_build = True
@@ -104,4 +104,11 @@ legacy_tox_ini = """
         mypy>=1.12
     commands =
         mypy {posargs:crifx tests}
+
+    [testenv:package]
+    description = package
+    deps =
+        build
+    commands =
+        python {posargs:-m build}
 """
