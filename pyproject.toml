@@ -53,7 +53,11 @@ include_trailing_comma = true
 pythonpath = "."
 
 [[tool.mypy.overrides]]
-module = "pylatex.*,pygit2.*"
+module = [
+    "pylatex.*",
+    "pygit2.*"
+]
+ignore_errors = true
 ignore_missing_imports = true
 
 [tool.tox]
@@ -97,7 +101,7 @@ legacy_tox_ini = """
     description = run type checks
     deps =
         pytest>=8
-        mypy>=1.10
+        mypy>=1.12
     commands =
         mypy {posargs:crifx tests}
 """

@@ -100,6 +100,7 @@ class ReportWriter:
         self.doc.preamble.append(
             Command("title", "CRIFX Contest Preparation Status Report")
         )
+        self.doc.preamble.append(Command("author", ""))
         self.doc.preamble.append(
             Command(
                 "date",

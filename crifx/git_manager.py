@@ -41,7 +41,7 @@ class GitManager:
 
     def get_committers_and_authors(self) -> list[GitUser]:
         """Get a list of every git user that has authored or committed a commit."""
-        last_commit = self.repo[self.repo.head.target]
+        last_commit = self.repo[self.repo.head.target]  # type: ignore
         git_users = set()
         for commit in self.repo.walk(last_commit.id, SortMode.TIME):
             author = commit.author
@@ -59,12 +59,12 @@ class GitManager:
         if file_status in (FileStatus.WT_NEW, FileStatus.INDEX_NEW):
             # Handle cases where the file is new and untracked or staged but
             # not committed. Assume that the current git user is the author.
-            name = self.repo.config.get_global_config()["user.name"]
-            email = self.repo.config.get_global_config()["user.email"]
+            name = self.repo.config.get_global_config()["user.name"]  # type: ignore
+            email = self.repo.config.get_global_config()["user.email"]  # type: ignore
             if name is not None and email is not None:
                 return GitUser.from_signature(Signature(name, email))
             return None
-        blame = self.repo.blame(
+        blame = self.repo.blame(  # type: ignore
             path, flags=BlameFlag.NORMAL | BlameFlag.IGNORE_WHITESPACE
         )
         lines_modified: defaultdict[GitUser, int] = defaultdict(int)
