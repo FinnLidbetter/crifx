@@ -68,6 +68,8 @@ class Problem:
         ac_loc_vals = []
         for submission in self.ac_submissions:
             ac_loc_vals.append(submission.lines_of_code)
+        if not ac_loc_vals:
+            return None
         ac_loc_vals.sort()
         middle = len(ac_loc_vals) // 2
         if len(ac_loc_vals) % 2 == 0:
