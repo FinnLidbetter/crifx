@@ -1,6 +1,6 @@
 # CRIFX
 
-CRIFX is the Contest pReparation Insights tool For anyone (X).
+CRIFX is the Contest Readiness Insights tool For anyone (X).
 
 Its purpose is to automatically produce pdf reports that give insights into
 tasks that are completed and tasks that are still outstanding in preparing
