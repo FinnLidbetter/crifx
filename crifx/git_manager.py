@@ -72,6 +72,8 @@ class GitManager:
         user_max = None
         for hunk in blame:
             committer = hunk.final_committer
+            if committer is None:
+                continue
             git_user = GitUser.from_signature(committer)
             lines_modified[git_user] += hunk.lines_in_hunk
             if lines_modified[git_user] > lines_max:
