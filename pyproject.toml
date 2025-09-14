@@ -19,6 +19,7 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Utilities",
 ]
 
@@ -63,12 +64,12 @@ ignore_missing_imports = true
 [tool.tox]
 legacy_tox_ini = """
     [tox]
-    envlist = format, lint, type, py{311,312}, package
+    envlist = format, lint, type, py{311,312,313}, package
     requires =
         tox>=4
     isolated_build = True
     labels =
-        test = py311, py312
+        test = py311, py312, py313
         static = format, lint, type
 
     [testenv]
