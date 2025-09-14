@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crifx"
-version = "0.1.5"
+version = "0.1.6"
 description = "icpc-style Contest pReparation Insights tool For anyone (X)."
 requires-python = ">=3.11"
 license = {file = "LICENSE"}
